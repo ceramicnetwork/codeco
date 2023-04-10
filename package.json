@@ -1,0 +1,76 @@
+{
+  "name": "codeco",
+  "version": "0.0.16",
+  "description": "Minimalistic yet feature-rich IO decoding and encoding",
+  "author": {
+    "email": "sergey@ukstv.me",
+    "name": "Sergey Ukustov"
+  },
+  "license": "(MIT OR Apache-2.0)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ceramicnetwork/codeco.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ceramicnetwork/codeco/issues"
+  },
+  "homepage": "https://github.com/ceramicnetwork/codeco",
+  "keywords": [
+    "encoding",
+    "decoding",
+    "codec",
+    "parser",
+    "combinator",
+    "encoder",
+    "decoder",
+    "runtime"
+  ],
+  "scripts": {
+    "build": "./node_modules/.bin/tsc -p tsconfig.build.json",
+    "test": "./node_modules/.bin/tsm ./node_modules/uvu/bin.js . .+\\.test\\.ts",
+    "test:watch": "./node_modules/.bin/watchlist src -- pnpm run test",
+    "prepublishOnly": "rm -rf dist/ && npm run build"
+  },
+  "type": "module",
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./either": {
+      "types": "./dist/either.d.ts",
+      "default": "./dist/either.js"
+    },
+    "./linear": {
+      "types": "./dist/linear.d.ts",
+      "default": "./dist/linear.js"
+    }
+  },
+  "devDependencies": {
+    "@types/sinon": "^10.0.13",
+    "conditional-type-checks": "^1.0.6",
+    "prettier": "^2.8.7",
+    "sinon": "^15.0.3",
+    "ts-essentials": "^9.3.1",
+    "tsm": "^2.3.0",
+    "typescript": "^5.0.4",
+    "uvu": "^0.5.6",
+    "watchlist": "^0.3.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.17.15"
+    }
+  }
+}
