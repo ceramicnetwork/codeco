@@ -6,7 +6,7 @@ export class HyphenatedStringCodec extends t.Codec<string> {
     super("HyphenatedString");
   }
 
-  decode(input: unknown, context: t.IContext): t.Validation<string> {
+  decode(input: unknown, context: t.Context): t.Validation<string> {
     const decodedE = t.string.decode(input, context);
     if (isLeft(decodedE)) return decodedE;
     const decoded = decodedE.right;

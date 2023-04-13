@@ -1,9 +1,9 @@
 import type { NonEmptyArray } from "ts-essentials";
 import { isLeft, left, right } from "./either.js";
-import type { Trail, Validation, Errors, IContext, Decoder } from "./struct.js";
+import type { Trail, Validation, Errors, Context, Decoder } from "./struct.js";
 import { ValidationError } from "./struct.js";
 
-export class LazyContext implements IContext {
+export class LazyContext implements Context {
   constructor(readonly trail: Trail) {}
 
   static root<TInput, TValue>(codec: Decoder<TInput, TValue>, input: TInput) {
@@ -22,13 +22,13 @@ export class LazyContext implements IContext {
     return left([new ValidationError(this.trail, message)]);
   }
 
-  child<TCodec extends Decoder<any, any>>(key: string, codec: TCodec, input: unknown): IContext {
+  child<TCodec extends Decoder<any, any>>(key: string, codec: TCodec, input: unknown): Context {
     const nextTrail = this.trail.concat([{ key: key, type: codec, actual: input }]);
     return new LazyContext(nextTrail);
   }
 }
 
-export class ThrowContext implements IContext {
+export class ThrowContext implements Context {
   constructor(readonly trail: Trail) {}
 
   static root<TInput, TValue>(codec: Decoder<TInput, TValue>, input: TInput) {
@@ -47,7 +47,7 @@ export class ThrowContext implements IContext {
     throw new ValidationError(this.trail, message);
   }
 
-  child<TCodec extends Decoder<any, any>>(key: string, codec: TCodec, input: unknown): IContext {
+  child<TCodec extends Decoder<any, any>>(key: string, codec: TCodec, input: unknown): Context {
     const nextTrail = this.trail.concat([{ key: key, type: codec, actual: input }]);
     return new ThrowContext(nextTrail);
   }

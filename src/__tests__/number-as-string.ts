@@ -10,7 +10,7 @@ class NumberAsString extends t.Codec<number, string> {
   is = t.number.is.bind(t.number);
   encode = String;
 
-  decode(input: unknown, context: t.IContext): Either<Errors, number> {
+  decode(input: unknown, context: t.Context): Either<Errors, number> {
     const stringE = t.string.decode(input, context);
     if (isLeft(stringE)) return stringE;
     const result = +stringE.right;

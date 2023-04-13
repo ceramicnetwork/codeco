@@ -21,7 +21,7 @@ export type Validation<A> = Either<Errors, A>;
 export type Is<A> = Refinement<unknown, A>;
 
 export type Encode<A, O> = (a: A) => O;
-export type Decode<I, A> = (input: I, context: IContext) => Validation<A>;
+export type Decode<I, A> = (input: I, context: Context) => Validation<A>;
 
 export interface Decoder<I, A> {
   readonly name: string;
@@ -30,13 +30,14 @@ export interface Decoder<I, A> {
 
 export type Trail = ReadonlyArray<TrailEntry>;
 
-export interface IContext {
+export interface Context {
   trail: Trail;
   success<TValue>(value: TValue): Validation<TValue>;
   failures<TValue>(errors: NonEmptyArray<ValidationError>): Validation<TValue>;
   failure<TValue>(message?: string): Validation<TValue>;
-  child<TCodec extends ANY>(key: string, codec: TCodec, input: unknown): IContext;
+  child<TCodec extends ANY>(key: string, codec: TCodec, input: unknown): Context;
 }
+export type IContext = Context;
 
 function getContextPath(trail: Trail): string {
   return `/` + trail.map(({ key, type }) => `${key}(${type.name})`).join("/");
@@ -111,7 +112,7 @@ export abstract class Codec<A, O = A, I = unknown> implements Decoder<I, A> {
 
   abstract is(input: unknown): input is A;
   abstract encode(value: A): O;
-  abstract decode(input: I, context: IContext): Validation<A>;
+  abstract decode(input: I, context: Context): Validation<A>;
 
   pipe<B, IB, A extends IB, OB extends A>(
     this: Type<A, O, I>,
@@ -143,7 +144,7 @@ export class PipeCodec<O, I, B, IB, A extends IB, OB extends A> extends Codec<B,
     this.#b = b;
   }
 
-  decode(input: A extends ANY ? A["_I"] : never, context: IContext): Validation<B> {
+  decode(input: A extends ANY ? A["_I"] : never, context: Context): Validation<B> {
     const aE = this.#a.decode(input, context);
     if (isLeft(aE)) return aE;
     const a = aE.right;
@@ -168,7 +169,7 @@ export class TrivialCodec<T> extends Codec<T> {
     super(name);
   }
   encode = identity;
-  decode(input: unknown, context: IContext): Validation<T> {
+  decode(input: unknown, context: Context): Validation<T> {
     if (this.is(input)) {
       return context.success(input);
     } else {
@@ -249,7 +250,7 @@ export class ArrayCodec<TCodec extends MIXED> extends Codec<Array<TypeOf<TCodec>
     super(name);
   }
 
-  decode(input: Array<InputOf<TCodec>>, context: IContext): Validation<Array<TypeOf<TCodec>>> {
+  decode(input: Array<InputOf<TCodec>>, context: Context): Validation<Array<TypeOf<TCodec>>> {
     const decodedArrayE = unknownArray.decode(input, context);
     if (isLeft(decodedArrayE)) return decodedArrayE;
     const decodedArray = decodedArrayE.right;
@@ -309,7 +310,7 @@ export class TypeCodec<P extends Props> extends Codec<MapOver<P, $TypeOf>, MapOv
     super(name);
   }
 
-  decode(input: unknown, context: IContext): Either<Errors, MapOver<P, $TypeOf>> {
+  decode(input: unknown, context: Context): Either<Errors, MapOver<P, $TypeOf>> {
     const inputE = object.decode(input, context);
     if (isLeft(inputE)) return inputE;
     const inputObject = inputE.right as any;
@@ -365,7 +366,7 @@ export class UnionCodec<TCodecs extends [MIXED, MIXED, ...Array<MIXED>]> extends
     super(name);
   }
 
-  decode(input: unknown, context: IContext): Validation<TypeOf<TCodecs[number]>> {
+  decode(input: unknown, context: Context): Validation<TypeOf<TCodecs[number]>> {
     const errors: Errors = [];
     for (const [index, codec] of this.codecs.entries()) {
       try {
@@ -376,7 +377,7 @@ export class UnionCodec<TCodecs extends [MIXED, MIXED, ...Array<MIXED>]> extends
           return context.success(result.right);
         }
       } catch (e) {
-        errors.push(e as ValidationError)
+        errors.push(e as ValidationError);
       }
     }
     return context.failures(errors as NonEmptyArray<ValidationError>);
@@ -417,7 +418,7 @@ export class RefinementCodec<TCodec extends ANY, B extends TypeOf<TCodec> = Type
     super(name);
   }
 
-  decode(input: InputOf<TCodec>, context: IContext): Validation<B> {
+  decode(input: InputOf<TCodec>, context: Context): Validation<B> {
     const decodedE = this.codec.decode(input, context);
     if (isLeft(decodedE)) return decodedE;
     if (this.predicate(decodedE.right)) {
@@ -465,7 +466,7 @@ export class DefaultsCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, Out
 
   is = this.codec.is.bind(this.codec);
   encode = this.codec.encode.bind(this.codec);
-  decode(input: InputOf<TCodec>, context: IContext): Validation<TypeOf<TCodec>> {
+  decode(input: InputOf<TCodec>, context: Context): Validation<TypeOf<TCodec>> {
     const decodedE = this.codec.decode(input, context);
     if (isLeft(decodedE)) {
       return context.success(this.replacement);
@@ -489,7 +490,7 @@ export class ReplacementCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, 
   }
   is = this.codec.is.bind(this.codec);
   encode = this.codec.encode.bind(this.codec);
-  decode(input: InputOf<TCodec>, context: IContext): Validation<TypeOf<TCodec>> {
+  decode(input: InputOf<TCodec>, context: Context): Validation<TypeOf<TCodec>> {
     const decodedE = this.codec.decode(input, context);
     if (isLeft(decodedE)) {
       return this.codec.decode(this.replacement, context);
@@ -511,7 +512,7 @@ export class TupleCodec<TCodecs extends [MIXED, ...Array<MIXED>]> extends Codec<
     super(name);
   }
 
-  decode(input: MapOver<TCodecs, $InputOf>, context: IContext): Validation<MapOver<TCodecs, $TypeOf>> {
+  decode(input: MapOver<TCodecs, $InputOf>, context: Context): Validation<MapOver<TCodecs, $TypeOf>> {
     const arrayE = unknownArray.decode(input, context);
     if (isLeft(arrayE)) return arrayE;
     const array = arrayE.right;
@@ -571,7 +572,7 @@ export class ExactCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, Output
     return this.codec.is(input);
   }
 
-  decode(input: InputOf<TCodec>, context: IContext): Validation<TypeOf<TCodec>> {
+  decode(input: InputOf<TCodec>, context: Context): Validation<TypeOf<TCodec>> {
     const dictionaryE = object.decode(input, context);
     if (isLeft(dictionaryE)) return dictionaryE;
     const dictionaryDecoded = dictionaryE.right as any;
@@ -655,7 +656,7 @@ export class PartialCodec<P extends Props> extends Codec<Partial<MapOver<P, $Typ
     });
   }
 
-  decode(input: unknown, context: IContext): Validation<Partial<MapOver<P, $TypeOf>>> {
+  decode(input: unknown, context: Context): Validation<Partial<MapOver<P, $TypeOf>>> {
     const dictionaryE = unknownRecord.decode(input, context);
     if (isLeft(dictionaryE)) return dictionaryE;
     const dictionary = dictionaryE.right;
@@ -731,7 +732,7 @@ export class IntersectionCodec<TCodecs extends Readonly<Array<ANY>>> extends Cod
     return this.codecs.every((codec) => codec.is(input));
   }
 
-  decode(input: unknown, context: IContext): Validation<Intersection<MapOver<TCodecs, $TypeOf>>> {
+  decode(input: unknown, context: Context): Validation<Intersection<MapOver<TCodecs, $TypeOf>>> {
     const us: Array<unknown> = [];
     const errors: Errors = [];
     for (const [index, codec] of this.codecs.entries()) {
@@ -787,7 +788,7 @@ export class NonEnumerableRecordCodec<D extends MIXED, C extends MIXED> extends 
     super(name);
   }
 
-  decode(input: unknown, context: IContext): Validation<{ [K in TypeOf<D>]: TypeOf<C> }> {
+  decode(input: unknown, context: Context): Validation<{ [K in TypeOf<D>]: TypeOf<C> }> {
     const dictionaryE = unknownRecord.decode(input, context);
     if (isLeft(dictionaryE)) return dictionaryE;
     const dictionary = dictionaryE.right;
@@ -840,7 +841,7 @@ export class EnumerableRecordCodec<D extends MIXED & EnumerableRecordDomain, C e
     this.keys = domain.keys;
   }
 
-  decode(input: unknown, context: IContext): Validation<{ [K in TypeOf<D>]: TypeOf<C> }> {
+  decode(input: unknown, context: Context): Validation<{ [K in TypeOf<D>]: TypeOf<C> }> {
     const recordE = unknownRecord.decode(input, context);
     if (isLeft(recordE)) return recordE;
     const inputRecord = recordE.right;
@@ -980,7 +981,7 @@ export class OptionalCodec<C extends ANY> extends Codec<
     this.#codec = union([codec, undefinedCodec]);
   }
 
-  decode(input: InputOf<C> | undefined, context: IContext): Validation<TypeOf<C> | undefined> {
+  decode(input: InputOf<C> | undefined, context: Context): Validation<TypeOf<C> | undefined> {
     return this.#codec.decode(input, context);
   }
 
@@ -1021,7 +1022,7 @@ export class SparseCodec<P extends Props> extends Codec<
     return output;
   }
 
-  decode(input: unknown, context: IContext): Either<Errors, MapOver<P, $TypeOf>> {
+  decode(input: unknown, context: Context): Either<Errors, MapOver<P, $TypeOf>> {
     const outputE = this.#codec.decode(input, context);
     if (isLeft(outputE)) return outputE;
     return context.success(this.#cleanup(outputE.right));
@@ -1033,10 +1034,10 @@ export class SparseCodec<P extends Props> extends Codec<
   }
 
   is(input: unknown): input is MapOver<RequiredProps<P>, $TypeOf> & MapOver<OptionalProps<P>, $TypeOf> {
-    const effectiveInput = { ...input as any }
+    const effectiveInput = { ...(input as any) };
     Object.entries(this.props).forEach(([propName, propCodec]) => {
       if (isOptionalCodec(propCodec) && !effectiveInput[propName]) {
-        effectiveInput[propName] = undefined
+        effectiveInput[propName] = undefined;
       }
     });
     return this.#codec.is(effectiveInput);

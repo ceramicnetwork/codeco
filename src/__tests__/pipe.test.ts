@@ -7,7 +7,7 @@ import { validate } from "../decoder";
 const floatAsString = new t.Type<number, string, string>(
   `float`,
   t.number.is,
-  (input: string, context: t.IContext) => {
+  (input: string, context: t.Context) => {
     const n = parseFloat(input);
     return isNaN(n) ? context.failure() : context.success(n);
   },
