@@ -14,9 +14,19 @@ export function isLeft<TError>(either: Either<TError, unknown>): either is Left<
   return either._tag === "Left";
 }
 
+/**
+ * Human-friendly alias for `isLeft`.
+ */
+export const isError = isLeft;
+
 export function isRight<TValue>(either: Either<unknown, TValue>): either is Right<TValue> {
   return either._tag === "Right";
 }
+
+/**
+ * Human-friendly alias for `isRight`.
+ */
+export const isValid = isRight;
 
 export function left<TError = never, TValue = never>(e: TError): Either<TError, TValue> {
   return { _tag: "Left", left: e };

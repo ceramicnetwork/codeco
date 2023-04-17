@@ -39,6 +39,19 @@ type Either<TError, TValue> =
     };
 ```
 
+You could check a result of validation using `isValid` or `isError` helpers:
+
+```typescript
+import { string, refinement, validate, isError } from "codeco";
+
+const longString = refinement(string, (s) => s.length >= 100);
+const validation = validate(longString, "short input");
+if (isError(validation)) {
+  console.log("Validation errorr", validation.left);
+}
+const valid = validation.right; // Here goes proper long string
+```
+
 ## Implemented types
 
 | Description           | TypeScript                  | codec                                                                      |
