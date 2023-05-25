@@ -22,6 +22,46 @@ export abstract class Codec<A, O = A, I = unknown> {
 }
 ```
 
+As an example, here is a codec for integer encoded as a string:
+
+```typescript
+// Represents integer `number`, the first type parameter.
+// If we encode a known number, it will turn into `string` (the second type parameter).
+// If we want to receive a number, the codec can accept `string` as input to parse (the third type parameter).
+// To decode `unknown` input do something like `string.pipe(numberAsString)`.
+class IntAsStringCodec extends Codec<number, string, string> {
+  constructor() {
+    super(`IntAsString`);
+  }
+
+  // Similar to `instanceof`.
+  is(input: unknown): input is number {
+    return typeof input === "number";
+  }
+
+  decode(input: string, context: Context): Validation<number> {
+    const supposedlyInt = parseInt(input, 10);
+    // If an integer
+    if (supposedlyInt.toString() === input) {
+      // Return value
+      // Beware: do not return plain value, wrap it in `context.success`
+      return context.success(supposedlyInt);
+    } else {
+      // If anything is wrong, signal failure by returning `context.failure`.
+      // Whatever happens, **do not throw an error**.
+      return context.failure(`Not an integer`);
+    }
+  }
+
+  // Encode known value to string output.
+  encode(value: number): string {
+    return value.toString();
+  }
+}
+
+const intAsString = new IntAsStringCodec();
+```
+
 The `Either` type represents a value of one of two possible types (a disjoint union):
 
 - `Left` meaning _success_,
