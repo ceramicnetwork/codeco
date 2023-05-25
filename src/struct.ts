@@ -1,6 +1,7 @@
 import { type Either, isLeft } from "./either.js";
 import type { NonEmptyArray } from "ts-essentials";
 import type { HKT, Intersection, MapOver } from "./hkt.js";
+import { LazyContext } from "./decoder.js";
 
 export function isNonEmpty<T>(array: Array<T>): array is NonEmptyArray<T> {
   return array.length > 0;
@@ -468,7 +469,7 @@ export class DefaultsCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, Out
     this.encode = this.codec.encode.bind(this.codec);
   }
   decode(input: InputOf<TCodec>, context: Context): Validation<TypeOf<TCodec>> {
-    const decodedE = this.codec.decode(input, context);
+    const decodedE = this.codec.decode(input, new LazyContext(context.trail));
     if (isLeft(decodedE)) {
       return context.success(this.replacement);
     } else {
@@ -495,7 +496,7 @@ export class ReplacementCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, 
     this.encode = this.codec.encode.bind(this.codec);
   }
   decode(input: InputOf<TCodec>, context: Context): Validation<TypeOf<TCodec>> {
-    const decodedE = this.codec.decode(input, context);
+    const decodedE = this.codec.decode(input, new LazyContext(context.trail));
     if (isLeft(decodedE)) {
       return this.codec.decode(this.replacement, context);
     } else {
