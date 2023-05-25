@@ -62,6 +62,9 @@ class IntAsStringCodec extends Codec<number, string, string> {
 const intAsString = new IntAsStringCodec();
 ```
 
+In most cases though, creating codecs this way is an overkill.
+Codec combinators [provided by the library](#implemented-types) are enough for 90% of use cases.
+
 The `Either` type represents a value of one of two possible types (a disjoint union):
 
 - `Left` meaning _success_,
