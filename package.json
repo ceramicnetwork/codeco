@@ -1,6 +1,6 @@
 {
   "name": "codeco",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Minimalistic yet feature-rich IO decoding and encoding",
   "author": {
     "email": "sergey@ukstv.me",
@@ -58,11 +58,11 @@
     }
   },
   "devDependencies": {
-    "@types/sinon": "^10.0.13",
+    "@types/sinon": "^10.0.15",
     "conditional-type-checks": "^1.0.6",
-    "prettier": "^2.8.7",
-    "sinon": "^15.0.3",
-    "ts-essentials": "^9.3.1",
+    "prettier": "^2.8.8",
+    "sinon": "^15.1.0",
+    "ts-essentials": "^9.3.2",
     "tsm": "^2.3.0",
     "typescript": "^5.0.4",
     "uvu": "^0.5.6",

@@ -456,16 +456,17 @@ export function refinement<TCodec extends ANY, B extends TypeOf<TCodec>>(
 }
 
 export class DefaultsCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, OutputOf<TCodec>, InputOf<TCodec>> {
+  readonly is: Is<TypeOf<TCodec>>;
+  readonly encode: Encode<TypeOf<TCodec>, OutputOf<TCodec>>;
   constructor(
     readonly codec: TCodec,
     readonly replacement: TypeOf<TCodec>,
     name: string = `(${codec.name} ❮ ${replacement})`
   ) {
     super(name);
+    this.is = this.codec.is.bind(this.codec);
+    this.encode = this.codec.encode.bind(this.codec);
   }
-
-  is = this.codec.is.bind(this.codec);
-  encode = this.codec.encode.bind(this.codec);
   decode(input: InputOf<TCodec>, context: Context): Validation<TypeOf<TCodec>> {
     const decodedE = this.codec.decode(input, context);
     if (isLeft(decodedE)) {
@@ -481,15 +482,18 @@ export function defaults<TCodec extends ANY>(codec: TCodec, replacement: TypeOf<
 }
 
 export class ReplacementCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, OutputOf<TCodec>, InputOf<TCodec>> {
+  readonly is: Is<TypeOf<TCodec>>;
+  readonly encode: Encode<TypeOf<TCodec>, OutputOf<TCodec>>;
+
   constructor(
     readonly codec: TCodec,
     readonly replacement: InputOf<TCodec>,
     name: string = `(${codec.name} ❮❮ ${replacement})`
   ) {
     super(name);
+    this.is = this.codec.is.bind(this.codec);
+    this.encode = this.codec.encode.bind(this.codec);
   }
-  is = this.codec.is.bind(this.codec);
-  encode = this.codec.encode.bind(this.codec);
   decode(input: InputOf<TCodec>, context: Context): Validation<TypeOf<TCodec>> {
     const decodedE = this.codec.decode(input, context);
     if (isLeft(decodedE)) {
