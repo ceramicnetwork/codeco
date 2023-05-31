@@ -34,7 +34,7 @@ export type Trail = ReadonlyArray<TrailEntry>;
 export interface Context {
   trail: Trail;
   success<TValue>(value: TValue): Validation<TValue>;
-  failures<TValue>(errors: NonEmptyArray<ValidationError>): Validation<TValue>;
+  failures<TValue>(errors: Errors): Validation<TValue>;
   failure<TValue>(message?: string): Validation<TValue>;
   child<TCodec extends ANY>(key: string, codec: TCodec, input: unknown): Context;
 }
