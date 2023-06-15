@@ -1,7 +1,7 @@
 import { test } from "uvu";
 import * as assert from "uvu/assert";
 import * as t from "../struct.js";
-import { IsExact } from "conditional-type-checks";
+import type { IsExact } from "conditional-type-checks";
 import { assertDecode, assertFailure } from "./assertions.util.js";
 import { validate } from "../decoder.js";
 

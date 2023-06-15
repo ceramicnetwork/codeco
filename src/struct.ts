@@ -73,20 +73,24 @@ export class ValidationError extends Error {
 export type ANY = Codec<any, any, any>;
 export type MIXED<T = any> = Codec<T, any, unknown>;
 
-export type TypeOf<T> = T extends ANY ? T["_A"] : never;
-export type InputOf<T> = T extends ANY ? T["_I"] : never;
-export type OutputOf<T> = T extends ANY ? T["_O"] : never;
+export type TypeOf<T extends ANY> = T["_A"];
+export type InputOf<T extends ANY> = T["_I"];
+export type OutputOf<T extends ANY> = T["_O"];
+
+export type TypeOf$<T> = T extends ANY ? T["_A"] : never;
+export type InputOf$<T> = T extends ANY ? T["_I"] : never;
+export type OutputOf$<T> = T extends ANY ? T["_O"] : never;
 
 interface $TypeOf extends HKT {
-  readonly type: TypeOf<this["_A"]>;
+  readonly type: TypeOf$<this["_A"]>;
 }
 
 interface $OutputOf extends HKT {
-  readonly type: OutputOf<this["_A"]>;
+  readonly type: OutputOf$<this["_A"]>;
 }
 
 interface $InputOf extends HKT {
-  readonly type: InputOf<this["_A"]>;
+  readonly type: InputOf$<this["_A"]>;
 }
 
 interface $PropsOf extends HKT {
