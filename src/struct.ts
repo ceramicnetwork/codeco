@@ -1,4 +1,4 @@
-import { type Either, isLeft } from "./either.js";
+import { type Either, isLeft, right } from "./either.js";
 import type { NonEmptyArray } from "ts-essentials";
 import type { HKT, Intersection, MapOver } from "./hkt.js";
 import { LazyContext } from "./decoder.js";
@@ -511,6 +511,44 @@ export class ReplacementCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, 
 
 export function replacement<TCodec extends ANY>(codec: TCodec, replacement: InputOf<TCodec>, name?: string) {
   return new ReplacementCodec(codec, replacement, name);
+}
+
+export class PostprocessDecodeCodec<TCodec extends ANY> extends Codec<
+  TypeOf<TCodec>,
+  OutputOf<TCodec>,
+  InputOf<TCodec>
+> {
+  readonly is: Is<TypeOf<TCodec>>;
+  readonly encode: Encode<TypeOf<TCodec>, OutputOf<TCodec>>;
+
+  constructor(
+    readonly codec: TCodec,
+    readonly onDecode: (input: TypeOf<TCodec>) => TypeOf<TCodec>,
+    name: string = `(${codec.name} ❮❮ ??})`
+  ) {
+    super(name);
+    this.is = this.codec.is.bind(this.codec);
+    this.encode = this.codec.encode.bind(this.codec);
+  }
+  decode(input: InputOf<TCodec>, context: Context): Validation<TypeOf<TCodec>> {
+    const decodedE = this.codec.decode(input, new LazyContext(context.trail));
+    if (isLeft(decodedE)) {
+      return decodedE;
+    } else {
+      return right(this.onDecode(decodedE.right));
+    }
+  }
+}
+
+/**
+ * Replace input in runtime for `codec`. For example, change `${CWD}` in the input to a current working dir.
+ */
+export function postprocessDecode<TCodec extends ANY>(
+  codec: TCodec,
+  replacementFn: PostprocessDecodeCodec<TCodec>["onDecode"],
+  name?: string
+) {
+  return new PostprocessDecodeCodec(codec, replacementFn, name);
 }
 
 export class TupleCodec<TCodecs extends [MIXED, ...Array<MIXED>]> extends Codec<

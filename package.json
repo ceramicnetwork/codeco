@@ -28,7 +28,7 @@
   "scripts": {
     "build": "./node_modules/.bin/tsc -p tsconfig.build.json",
     "test": "./node_modules/.bin/tsm ./node_modules/uvu/bin.js . .+\\.test\\.ts",
-    "test:watch": "./node_modules/.bin/watchlist src -- pnpm run test",
+    "test:watch": "./node_modules/.bin/watchlist --eager src -- pnpm run test",
     "prepublishOnly": "rm -rf dist/ && npm run build"
   },
   "type": "module",
