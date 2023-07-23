@@ -547,7 +547,7 @@ export function postprocessDecode<TCodec extends ANY>(
   codec: TCodec,
   replacementFn: PostprocessDecodeCodec<TCodec>["onDecode"],
   name?: string
-) {
+): PostprocessDecodeCodec<TCodec> {
   return new PostprocessDecodeCodec(codec, replacementFn, name);
 }
 
