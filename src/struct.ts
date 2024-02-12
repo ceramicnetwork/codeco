@@ -1060,7 +1060,7 @@ export class SparseCodec<P extends Props> extends Codec<
     this.#codec = new TypeCodec(props);
   }
 
-  #cleanup(output: any): any {
+  cleanup(output: any): any {
     Object.entries(this.props).forEach(([propName, propCodec]) => {
       if (isOptionalCodec(propCodec) && !output[propName]) {
         delete output[propName];
@@ -1072,12 +1072,12 @@ export class SparseCodec<P extends Props> extends Codec<
   decode(input: unknown, context: Context): Either<Errors, MapOver<P, $TypeOf>> {
     const outputE = this.#codec.decode(input, context);
     if (isLeft(outputE)) return outputE;
-    return context.success(this.#cleanup(outputE.right));
+    return context.success(this.cleanup(outputE.right));
   }
 
   encode(value: MapOver<RequiredProps<P>, $TypeOf> & MapOver<OptionalProps<P>, $TypeOf>): MapOver<P, $OutputOf> {
     const output = this.#codec.encode(value as any);
-    return this.#cleanup(output);
+    return this.cleanup(output);
   }
 
   is(input: unknown): input is MapOver<RequiredProps<P>, $TypeOf> & MapOver<OptionalProps<P>, $TypeOf> {
