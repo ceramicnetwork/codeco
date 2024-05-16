@@ -280,7 +280,7 @@ export class ArrayCodec<TCodec extends MIXED> extends Codec<Array<TypeOf<TCodec>
     if (this.item.encode === identity) {
       return value;
     } else {
-      return value.map(this.item.encode);
+      return value.map((itemValue) => this.item.encode(itemValue));
     }
   }
 
