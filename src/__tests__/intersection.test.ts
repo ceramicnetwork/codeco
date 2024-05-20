@@ -51,12 +51,12 @@ test("decode", () => {
   assertFailure(
     validate(T, null as any),
     "Invalid value null supplied to /({a:string}&{b:number})/0({a:string})",
-    "Invalid value null supplied to /({a:string}&{b:number})/1({b:number})"
+    "Invalid value null supplied to /({a:string}&{b:number})/1({b:number})",
   );
   assertFailure(
     validate(T, { a: 1 }),
     "Invalid value 1 supplied to /({a:string}&{b:number})/0({a:string})/a(string)",
-    "Invalid value undefined supplied to /({a:string}&{b:number})/1({b:number})/b(number)"
+    "Invalid value undefined supplied to /({a:string}&{b:number})/1({b:number})/b(number)",
   );
   // Keep unknown properties
   assertDecode(T, { a: "1", b: 1, c: true });
@@ -67,7 +67,7 @@ test("decode", () => {
   assertDecode(T6, { a: "a", b: 1, c: true }, { a: "a", b: 1 });
   assertFailure(
     validate(T6, { a: "a" }),
-    "Invalid value undefined supplied to /(Exact<{a:string}>&Exact<{b:number}>)/1(Exact<{b:number}>)/b(number)"
+    "Invalid value undefined supplied to /(Exact<{a:string}>&Exact<{b:number}>)/1(Exact<{b:number}>)/b(number)",
   );
 
   const T7 = t.intersection([t.exact(t.type({})), t.partial({ a: t.number })]);
@@ -134,7 +134,7 @@ test("handle primitives", () => {
   assertFailure(
     validate(T1, 1),
     "Invalid value 1 supplied to /(string&string)/0(string)",
-    "Invalid value 1 supplied to /(string&string)/1(string)"
+    "Invalid value 1 supplied to /(string&string)/1(string)",
   );
   assert.equal(T1.encode("a"), "a");
   const T2 = t.intersection([numberAsString, numberAsString]);

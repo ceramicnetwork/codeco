@@ -57,7 +57,7 @@ nonEnumerable("decode", () => {
   assertDecode(T3, { ab: 1 }, { "a-b": 1 });
   assertFailure(
     validate(T3, { a: 1 }),
-    'Invalid value "a" supplied to /({[HyphenatedString]:number})/a(HyphenatedString)'
+    'Invalid value "a" supplied to /({[HyphenatedString]:number})/a(HyphenatedString)',
   );
 
   const T4 = t.record(t.string, t.any);
@@ -110,7 +110,7 @@ enumerable("decode", () => {
   assertFailure(
     validate(T2, {}),
     'Invalid value undefined supplied to /({["a"|"b"]:string})/a(string)',
-    'Invalid value undefined supplied to /({["a"|"b"]:string})/b(string)'
+    'Invalid value undefined supplied to /({["a"|"b"]:string})/b(string)',
   );
   assertFailure(validate(T2, { a: "a" }), 'Invalid value undefined supplied to /({["a"|"b"]:string})/b(string)');
   assertFailure(validate(T2, { b: "b" }), 'Invalid value undefined supplied to /({["a"|"b"]:string})/a(string)');
@@ -119,7 +119,7 @@ enumerable("decode", () => {
   assertDecode(T3, { a: "a", b: "b" });
   assertFailure(
     validate(T3, { b: "b" }),
-    'Invalid value undefined supplied to /({["a"]:string}&{[string]:unknown})/0({["a"]:string})/a(string)'
+    'Invalid value undefined supplied to /({["a"]:string}&{[string]:unknown})/0({["a"]:string})/a(string)',
   );
 });
 

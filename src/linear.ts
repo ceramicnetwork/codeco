@@ -51,7 +51,7 @@ export function literal<P extends string>(value: string): Combinator<string, P> 
 
 export function foldMap<A, B, P extends TapeSubstrate>(
   combinator: Combinator<A, P>,
-  fn: (a: A) => Maybe<B>
+  fn: (a: A) => Maybe<B>,
 ): Combinator<B, P> {
   return function map(tape) {
     const prev = tape.position;
@@ -93,7 +93,7 @@ export function joinSeq<P extends TapeSubstrate>(...combinators: Array<Combinato
 
 export function join<P extends TapeSubstrate>(
   input: Combinator<Array<string>, P>,
-  separator = ""
+  separator = "",
 ): Combinator<string, P> {
   return function (tape: Tape<P>) {
     const prev = tape.position;
@@ -113,7 +113,7 @@ export function seq<A, B, C, D, E, F, G, P extends TapeSubstrate>(
   d: Combinator<D, P>,
   e: Combinator<E, P>,
   f: Combinator<F, P>,
-  g: Combinator<G, P>
+  g: Combinator<G, P>,
 ): Combinator<[A, B, C, D, E, F, G], P>;
 export function seq<A, B, C, D, E, F, P extends TapeSubstrate>(
   a: Combinator<A, P>,
@@ -121,25 +121,25 @@ export function seq<A, B, C, D, E, F, P extends TapeSubstrate>(
   c: Combinator<C, P>,
   d: Combinator<D, P>,
   e: Combinator<E, P>,
-  f: Combinator<F, P>
+  f: Combinator<F, P>,
 ): Combinator<[A, B, C, D, E, F], P>;
 export function seq<A, B, C, D, E, P extends TapeSubstrate>(
   a: Combinator<A, P>,
   b: Combinator<B, P>,
   c: Combinator<C, P>,
   d: Combinator<D, P>,
-  e: Combinator<E, P>
+  e: Combinator<E, P>,
 ): Combinator<[A, B, C, D, E], P>;
 export function seq<A, B, C, D, P extends TapeSubstrate>(
   a: Combinator<A, P>,
   b: Combinator<B, P>,
   c: Combinator<C, P>,
-  d: Combinator<D, P>
+  d: Combinator<D, P>,
 ): Combinator<[A, B, C, D], P>;
 export function seq<A, B, C, P extends TapeSubstrate>(
   a: Combinator<A, P>,
   b: Combinator<B, P>,
-  c: Combinator<C, P>
+  c: Combinator<C, P>,
 ): Combinator<[A, B, C], P>;
 export function seq<A, B, P extends TapeSubstrate>(a: Combinator<A, P>, b: Combinator<B, P>): Combinator<[A, B], P>;
 export function seq<P extends TapeSubstrate>(...combinators: Array<Combinator<any, P>>): Combinator<any, P> {
@@ -182,7 +182,7 @@ export function choice<A, B, C, D, G, F, H, I, J, P extends TapeSubstrate>(
   f: Combinator<F, P>,
   h: Combinator<H, P>,
   i: Combinator<I, P>,
-  j: Combinator<J, P>
+  j: Combinator<J, P>,
 ): Combinator<A | B | C | D | G | F | H | I | J, P>;
 export function choice<A, B, C, D, G, F, H, I, P extends TapeSubstrate>(
   a: Combinator<A, P>,
@@ -192,7 +192,7 @@ export function choice<A, B, C, D, G, F, H, I, P extends TapeSubstrate>(
   g: Combinator<G, P>,
   f: Combinator<F, P>,
   h: Combinator<H, P>,
-  i: Combinator<I, P>
+  i: Combinator<I, P>,
 ): Combinator<A | B | C | D | G | F | H | I, P>;
 export function choice<A, B, C, D, G, F, H, P extends TapeSubstrate>(
   a: Combinator<A, P>,
@@ -201,7 +201,7 @@ export function choice<A, B, C, D, G, F, H, P extends TapeSubstrate>(
   d: Combinator<D, P>,
   g: Combinator<G, P>,
   f: Combinator<F, P>,
-  h: Combinator<H, P>
+  h: Combinator<H, P>,
 ): Combinator<A | B | C | D | G | F | H, P>;
 export function choice<A, B, C, D, G, F, P extends TapeSubstrate>(
   a: Combinator<A, P>,
@@ -209,25 +209,25 @@ export function choice<A, B, C, D, G, F, P extends TapeSubstrate>(
   c: Combinator<C, P>,
   d: Combinator<D, P>,
   g: Combinator<G, P>,
-  f: Combinator<F, P>
+  f: Combinator<F, P>,
 ): Combinator<A | B | C | D | G | F, P>;
 export function choice<A, B, C, D, G, P extends TapeSubstrate>(
   a: Combinator<A, P>,
   b: Combinator<B, P>,
   c: Combinator<C, P>,
   d: Combinator<D, P>,
-  g: Combinator<G, P>
+  g: Combinator<G, P>,
 ): Combinator<A | B | C | D | G, P>;
 export function choice<A, B, C, D, P extends TapeSubstrate>(
   a: Combinator<A, P>,
   b: Combinator<B, P>,
   c: Combinator<C, P>,
-  d: Combinator<D, P>
+  d: Combinator<D, P>,
 ): Combinator<A | B | C | D, P>;
 export function choice<A, B, C, P extends TapeSubstrate>(
   a: Combinator<A, P>,
   b: Combinator<B, P>,
-  c: Combinator<C, P>
+  c: Combinator<C, P>,
 ): Combinator<A | B | C, P>;
 export function choice<A, B, P extends TapeSubstrate>(a: Combinator<A, P>, b: Combinator<B, P>): Combinator<A | B, P>;
 export function choice<A, P extends TapeSubstrate>(a: Combinator<A, P>): Combinator<A, P>;
@@ -252,7 +252,7 @@ export function sepBy<T, TSep, P extends TapeSubstrate>(
   element: Combinator<T, P>,
   separator: Combinator<TSep, P>,
   min: number = 1,
-  max = Infinity
+  max = Infinity,
 ): Combinator<Array<T>, P> {
   return function (tape) {
     const prev = tape.position;
@@ -290,7 +290,7 @@ export function sepBy<T, TSep, P extends TapeSubstrate>(
 export function many<T, P extends TapeSubstrate>(
   element: Combinator<T, P>,
   min: number = 1,
-  max = Infinity
+  max = Infinity,
 ): Combinator<Array<T>, P> {
   return function many(tape: Tape<P>) {
     const prev = tape.position;

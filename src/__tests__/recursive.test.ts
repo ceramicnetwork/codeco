@@ -14,7 +14,7 @@ const T: t.Codec<T> = t.recursive("T", (self) =>
   t.type({
     a: t.number,
     b: t.union([self, t.undefined, t.null]),
-  })
+  }),
 );
 
 test("is", () => {
@@ -26,7 +26,7 @@ test("is", () => {
     t.type({
       a: t.number,
       b: t.union([self, t.null]),
-    })
+    }),
   );
   assert.ok(T.is({ a: 0, b: null }));
   assert.not.ok(T.is({ a: 0 }));
@@ -39,7 +39,7 @@ test("is", () => {
     t.type({
       a: numberAsString,
       b: t.union([self, t.null]),
-    })
+    }),
   );
   assert.ok(T2.is({ a: 0, b: null }));
   assert.not.ok(T2.is({ a: 0 }));
@@ -54,7 +54,7 @@ test("decode", () => {
     validate(T, { a: 1, b: {} }),
     "Invalid value undefined supplied to /(T)/b(T|undefined|null)/0(T)/a(number)",
     "Invalid value {} supplied to /(T)/b(T|undefined|null)/1(undefined)",
-    "Invalid value {} supplied to /(T)/b(T|undefined|null)/2(null)"
+    "Invalid value {} supplied to /(T)/b(T|undefined|null)/2(null)",
   );
 });
 
@@ -71,7 +71,7 @@ test("encode", () => {
     t.type({
       a: numberAsString,
       b: t.union([self, t.null]),
-    })
+    }),
   );
   assert.equal(T.encode({ a: 0, b: null }), { a: "0", b: null });
   assert.equal(T.encode({ a: 0, b: { a: 1, b: null } }), { a: "0", b: { a: "1", b: null } });
@@ -86,7 +86,7 @@ test("codec field", () => {
     t.type({
       a: t.number,
       b: t.union([self, t.null]),
-    })
+    }),
   );
   assert.instance(T.codec, t.Codec);
   assert.equal(T.codec.name, "T");
@@ -105,12 +105,12 @@ test("mutually recursive types", () => {
   const A: t.Codec<A> = t.recursive("A", () =>
     t.type({
       b: t.union([A, B, t.null]),
-    })
+    }),
   );
   const B: t.Codec<B> = t.recursive("B", () =>
     t.type({
       a: t.union([A, t.null]),
-    })
+    }),
   );
   assert.ok(A.is({ b: { b: null } }));
   assert.ok(A.is({ b: { a: { b: { a: null } } } }));
@@ -122,7 +122,7 @@ test("mutually recursive types", () => {
   const C1: t.Codec<C1A> = t.recursive("C1", () =>
     t.type({
       a: t.union([C2, t.string]),
-    })
+    }),
   );
   const C2: t.Codec<C1A> = t.recursive("C2", () => C1);
   const C3 = t.union([C1, t.string]);

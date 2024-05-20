@@ -60,7 +60,7 @@
   "devDependencies": {
     "@types/sinon": "^17.0.3",
     "conditional-type-checks": "^1.0.6",
-    "prettier": "^2.8.8",
+    "prettier": "^3.2.5",
     "sinon": "^18.0.0",
     "ts-essentials": "^10.0.0",
     "tsm": "^2.3.0",

@@ -11,7 +11,7 @@ const floatAsString = new t.Type<number, string, string>(
     const n = parseFloat(input);
     return isNaN(n) ? context.failure() : context.success(n);
   },
-  String
+  String,
 );
 
 const T = t.string.pipe(floatAsString);

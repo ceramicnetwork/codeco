@@ -40,7 +40,7 @@ test("decode", () => {
   assertFailure(
     validate(T, []),
     "Invalid value undefined supplied to /([number,string])/0(number)",
-    "Invalid value undefined supplied to /([number,string])/1(string)"
+    "Invalid value undefined supplied to /([number,string])/1(string)",
   );
   assertFailure(validate(T, [1]), "Invalid value undefined supplied to /([number,string])/1(string)");
   assertFailure(validate(T, [1, 1]), "Invalid value 1 supplied to /([number,string])/1(string)");

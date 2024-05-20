@@ -26,7 +26,7 @@ type MapIn<P, F extends HKT> = { [K in keyof P]: Kind<F, P[K]> };
 
 export type MapOf<Tuple extends readonly unknown[], F extends HKT, Result extends List = []> = Tuple extends readonly [
   unknown,
-  ...unknown[]
+  ...unknown[],
 ]
   ? MapOf<Tail<Tuple>, F, Append<Result, Kind<F, Head<Tuple>>>>
   : Result;

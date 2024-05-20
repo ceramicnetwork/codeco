@@ -60,7 +60,7 @@ function stringify(v: any): string {
 export class ValidationError extends Error {
   constructor(
     readonly trail: Trail,
-    message: string = `Invalid value ${stringify(trail[trail.length - 1].actual)} supplied to ${getContextPath(trail)}`
+    message: string = `Invalid value ${stringify(trail[trail.length - 1].actual)} supplied to ${getContextPath(trail)}`,
   ) {
     super(message);
   }
@@ -102,8 +102,8 @@ type WithProps = { props: Props } | { codec: WithProps };
 type PropsOf<TCodec> = TCodec extends { props: infer P extends Props }
   ? P
   : TCodec extends { codec: infer P }
-  ? PropsOf<P>
-  : {};
+    ? PropsOf<P>
+    : {};
 
 export abstract class Codec<A, O = A, I = unknown> implements Decoder<I, A> {
   readonly _A!: A;
@@ -122,7 +122,7 @@ export abstract class Codec<A, O = A, I = unknown> implements Decoder<I, A> {
   pipe<B, IB, A extends IB, OB extends A>(
     this: Type<A, O, I>,
     ab: Type<B, OB, IB>,
-    name = `${this.name}→${ab.name}`
+    name = `${this.name}→${ab.name}`,
   ): Type<B, O, I> {
     return new Type<B, O, I>(
       name,
@@ -134,7 +134,7 @@ export abstract class Codec<A, O = A, I = unknown> implements Decoder<I, A> {
         }
         return ab.decode(e.right, c);
       },
-      this.encode === identity && ab.encode === identity ? (identity as any) : (b) => this.encode(ab.encode(b))
+      this.encode === identity && ab.encode === identity ? (identity as any) : (b) => this.encode(ab.encode(b)),
     );
   }
 }
@@ -170,7 +170,10 @@ export function identity<T>(value: T) {
 }
 
 export class TrivialCodec<T> extends Codec<T> {
-  constructor(name: string, readonly is: Is<T>) {
+  constructor(
+    name: string,
+    readonly is: Is<T>,
+  ) {
     super(name);
   }
   encode = identity;
@@ -187,41 +190,44 @@ export const nullCodec = new TrivialCodec<null>("null", (input: unknown): input 
 
 export const undefinedCodec = new TrivialCodec<undefined>(
   "undefined",
-  (input: unknown): input is undefined => input === undefined
+  (input: unknown): input is undefined => input === undefined,
 );
 
 export const voidCodec = new TrivialCodec<void>("void", (input: unknown): input is void => input === undefined);
 
 export const string = new TrivialCodec<string>(
   "string",
-  (input: unknown): input is string => typeof input === "string"
+  (input: unknown): input is string => typeof input === "string",
 );
 
 export const number = new TrivialCodec<number>(
   "number",
-  (input: unknown): input is number => typeof input === "number"
+  (input: unknown): input is number => typeof input === "number",
 );
 
 export const boolean = new TrivialCodec<boolean>(
   "boolean",
-  (input: unknown): input is boolean => typeof input === "boolean"
+  (input: unknown): input is boolean => typeof input === "boolean",
 );
 
 export const bigint = new TrivialCodec<bigint>(
   "bigint",
-  (input: unknown): input is bigint => typeof input === "bigint"
+  (input: unknown): input is bigint => typeof input === "bigint",
 );
 
 export const unknown = new TrivialCodec<unknown>("unknown", (input: unknown): input is unknown => true);
 
 export const object = new TrivialCodec<object>(
   "object",
-  (input: unknown): input is object => Boolean(input) && typeof input === "object"
+  (input: unknown): input is object => Boolean(input) && typeof input === "object",
 );
 
 export class LiteralCodec<TValue extends string | number | boolean> extends TrivialCodec<TValue> {
   readonly keys: TValue[];
-  constructor(private readonly value: TValue, name: string = JSON.stringify(value)) {
+  constructor(
+    private readonly value: TValue,
+    name: string = JSON.stringify(value),
+  ) {
     super(name, (input: unknown): input is TValue => input === value);
     this.keys = [value];
   }
@@ -233,7 +239,7 @@ export function literal<TValue extends string | number | boolean>(value: TValue,
 
 export const unknownArray = new TrivialCodec<Array<unknown>>(
   "UnknownArray",
-  (input: unknown): input is Array<unknown> => Array.isArray(input)
+  (input: unknown): input is Array<unknown> => Array.isArray(input),
 );
 
 export const unknownRecord = new TrivialCodec<Record<string, unknown>>(
@@ -247,11 +253,14 @@ export const unknownRecord = new TrivialCodec<Record<string, unknown>>(
     if (!proto) return true;
     const Ctor = Object.hasOwn(proto, "constructor") && proto.constructor;
     return typeof Ctor === "function" && Ctor instanceof Ctor && Ctor.toString() == Object.toString();
-  }
+  },
 );
 
 export class ArrayCodec<TCodec extends MIXED> extends Codec<Array<TypeOf<TCodec>>, Array<OutputOf<TCodec>>> {
-  constructor(readonly item: TCodec, name: string) {
+  constructor(
+    readonly item: TCodec,
+    name: string,
+  ) {
     super(name);
   }
 
@@ -291,7 +300,7 @@ export class ArrayCodec<TCodec extends MIXED> extends Codec<Array<TypeOf<TCodec>
 
 export function array<TCodec extends MIXED>(
   item: TCodec,
-  name: string = `${item.name}[]`
+  name: string = `${item.name}[]`,
 ): Codec<Array<TypeOf<TCodec>>, Array<OutputOf<TCodec>>> & { item: TCodec } {
   return new ArrayCodec(item, name);
 }
@@ -311,7 +320,10 @@ export function getNameFromProps(props: Props): string {
 }
 
 export class TypeCodec<P extends Props> extends Codec<MapOver<P, $TypeOf>, MapOver<P, $OutputOf>> {
-  constructor(readonly props: P, name: string = getInterfaceTypeName(props)) {
+  constructor(
+    readonly props: P,
+    name: string = getInterfaceTypeName(props),
+  ) {
     super(name);
   }
 
@@ -367,7 +379,10 @@ export class UnionCodec<TCodecs extends [MIXED, MIXED, ...Array<MIXED>]> extends
   TypeOf<TCodecs[number]>,
   OutputOf<TCodecs[number]>
 > {
-  constructor(readonly codecs: TCodecs, name: string = getUnionName(codecs)) {
+  constructor(
+    readonly codecs: TCodecs,
+    name: string = getUnionName(codecs),
+  ) {
     super(name);
   }
 
@@ -418,7 +433,7 @@ export class RefinementCodec<TCodec extends ANY, B extends TypeOf<TCodec> = Type
   constructor(
     readonly codec: TCodec,
     readonly predicate: Predicate<TypeOf<TCodec>>,
-    name = `${codec.name}≍${getFunctionName(predicate)}`
+    name = `${codec.name}≍${getFunctionName(predicate)}`,
   ) {
     super(name);
   }
@@ -445,17 +460,17 @@ export class RefinementCodec<TCodec extends ANY, B extends TypeOf<TCodec> = Type
 export function refinement<TCodec extends ANY, B extends TypeOf<TCodec>>(
   codec: TCodec,
   predicate: Refinement<TypeOf<TCodec>, B>,
-  name?: string
+  name?: string,
 ): RefinementCodec<TCodec, B>;
 export function refinement<TCodec extends ANY, B extends TypeOf<TCodec>>(
   codec: TCodec,
   predicate: Predicate<TypeOf<TCodec>>,
-  name?: string
+  name?: string,
 ): RefinementCodec<TCodec, TypeOf<TCodec>>;
 export function refinement<TCodec extends ANY, B extends TypeOf<TCodec>>(
   codec: TCodec,
   predicate: Predicate<TypeOf<TCodec>>,
-  name?: string
+  name?: string,
 ): RefinementCodec<TCodec, TypeOf<TCodec>> {
   return new RefinementCodec(codec, predicate, name);
 }
@@ -466,7 +481,7 @@ export class DefaultsCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, Out
   constructor(
     readonly codec: TCodec,
     readonly replacement: TypeOf<TCodec>,
-    name: string = `(${codec.name} ❮ ${replacement})`
+    name: string = `(${codec.name} ❮ ${replacement})`,
   ) {
     super(name);
     this.is = this.codec.is.bind(this.codec);
@@ -493,7 +508,7 @@ export class ReplacementCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, 
   constructor(
     readonly codec: TCodec,
     readonly replacement: InputOf<TCodec>,
-    name: string = `(${codec.name} ❮❮ ${replacement})`
+    name: string = `(${codec.name} ❮❮ ${replacement})`,
   ) {
     super(name);
     this.is = this.codec.is.bind(this.codec);
@@ -524,7 +539,7 @@ export class PostprocessDecodeCodec<TCodec extends ANY> extends Codec<
   constructor(
     readonly codec: TCodec,
     readonly onDecode: (input: TypeOf<TCodec>) => TypeOf<TCodec>,
-    name: string = `(${codec.name} ❮❮ ??})`
+    name: string = `(${codec.name} ❮❮ ??})`,
   ) {
     super(name);
     this.is = this.codec.is.bind(this.codec);
@@ -546,7 +561,7 @@ export class PostprocessDecodeCodec<TCodec extends ANY> extends Codec<
 export function postprocessDecode<TCodec extends ANY>(
   codec: TCodec,
   replacementFn: PostprocessDecodeCodec<TCodec>["onDecode"],
-  name?: string
+  name?: string,
 ): PostprocessDecodeCodec<TCodec> {
   return new PostprocessDecodeCodec(codec, replacementFn, name);
 }
@@ -555,7 +570,10 @@ export class TupleCodec<TCodecs extends [MIXED, ...Array<MIXED>]> extends Codec<
   MapOver<TCodecs, $TypeOf>,
   MapOver<TCodecs, $OutputOf>
 > {
-  constructor(readonly codecs: TCodecs, readonly name: string = `[${codecs.map((type) => type.name).join(",")}]`) {
+  constructor(
+    readonly codecs: TCodecs,
+    readonly name: string = `[${codecs.map((type) => type.name).join(",")}]`,
+  ) {
     super(name);
   }
 
@@ -610,7 +628,10 @@ function stripKeys<T extends Record<string, unknown>>(o: T, props: Props): T {
 export class ExactCodec<TCodec extends ANY> extends Codec<TypeOf<TCodec>, OutputOf<TCodec>, InputOf<TCodec>> {
   readonly props: PropsOf<TCodec>;
 
-  constructor(readonly codec: TCodec & WithProps, name: string = `Exact<${codec.name}>`) {
+  constructor(
+    readonly codec: TCodec & WithProps,
+    name: string = `Exact<${codec.name}>`,
+  ) {
     super(name);
     this.props = getProps(codec);
   }
@@ -663,7 +684,10 @@ export class ReadonlyCodec<TCodec extends ANY> extends Codec<
   OutputOf<TCodec>,
   InputOf<TCodec>
 > {
-  constructor(readonly codec: TCodec, readonly name = `Readonly<${codec.name}>`) {
+  constructor(
+    readonly codec: TCodec,
+    readonly name = `Readonly<${codec.name}>`,
+  ) {
     super(name);
   }
   is = this.codec.is.bind(this.codec);
@@ -676,7 +700,10 @@ export function readonly<TCodec extends ANY>(codec: TCodec, name?: string) {
 }
 
 export class PartialCodec<P extends Props> extends Codec<Partial<MapOver<P, $TypeOf>>, Partial<MapOver<P, $OutputOf>>> {
-  constructor(readonly props: P, name: string = `Partial<${getInterfaceTypeName(props)}>`) {
+  constructor(
+    readonly props: P,
+    name: string = `Partial<${getInterfaceTypeName(props)}>`,
+  ) {
     super(name);
   }
 
@@ -763,7 +790,10 @@ export class IntersectionCodec<TCodecs extends Readonly<Array<ANY>>> extends Cod
 > {
   readonly props: Intersection<MapOver<TCodecs, $PropsOf>>;
 
-  constructor(readonly codecs: TCodecs, name: string = `${codecs.map((c) => c.name).join("&")}`) {
+  constructor(
+    readonly codecs: TCodecs,
+    name: string = `${codecs.map((c) => c.name).join("&")}`,
+  ) {
     super(name);
     this.props = Object.assign({}, ...codecs.map((c) => getProps(c)));
   }
@@ -771,7 +801,7 @@ export class IntersectionCodec<TCodecs extends Readonly<Array<ANY>>> extends Cod
   encode(value: Intersection<MapOver<TCodecs, $TypeOf>>): Intersection<MapOver<TCodecs, $OutputOf>> {
     return mergeAll(
       value,
-      this.codecs.map((codec) => codec.encode(value))
+      this.codecs.map((codec) => codec.encode(value)),
     );
   }
 
@@ -814,12 +844,12 @@ export function keyof<D extends Record<string, unknown>>(
   keys: D,
   name = Object.keys(keys)
     .map((k) => JSON.stringify(k))
-    .join("|")
+    .join("|"),
 ) {
   return new KeyOfCodec(
     Object.keys(keys),
     name,
-    (input): input is keyof D => string.is(input) && Object.hasOwn(keys, input)
+    (input): input is keyof D => string.is(input) && Object.hasOwn(keys, input),
   );
 }
 
@@ -831,7 +861,11 @@ export class NonEnumerableRecordCodec<D extends MIXED, C extends MIXED> extends 
   { [K in TypeOf<D>]: TypeOf<C> },
   { [K in OutputOf<D>]: OutputOf<C> }
 > {
-  constructor(readonly domain: D, readonly codomain: C, name: string = `{[${domain.name}]:${codomain.name}}`) {
+  constructor(
+    readonly domain: D,
+    readonly codomain: C,
+    name: string = `{[${domain.name}]:${codomain.name}}`,
+  ) {
     super(name);
   }
 
@@ -883,7 +917,11 @@ export class EnumerableRecordCodec<D extends MIXED & EnumerableRecordDomain, C e
 > {
   readonly keys: string[];
 
-  constructor(readonly domain: D, readonly codomain: C, name: string = `{[${domain.name}]:${codomain.name}}`) {
+  constructor(
+    readonly domain: D,
+    readonly codomain: C,
+    name: string = `{[${domain.name}]:${codomain.name}}`,
+  ) {
     super(name);
     this.keys = domain.keys;
   }
@@ -930,17 +968,17 @@ export interface EnumerableRecordDomain {
 export function record<D extends MIXED<string>, C extends MIXED>(
   domain: D,
   codomain: C,
-  name?: string
+  name?: string,
 ): NonEnumerableRecordCodec<D, C>;
 export function record<D extends MIXED<string>, C extends MIXED>(
   domain: D & EnumerableRecordDomain,
   codomain: C,
-  name?: string
+  name?: string,
 ): EnumerableRecordCodec<D & EnumerableRecordDomain, C>;
 export function record<D extends MIXED<string>, C extends MIXED>(
   domain: D | (D & EnumerableRecordDomain),
   codomain: C,
-  name?: string
+  name?: string,
 ): EnumerableRecordCodec<D & EnumerableRecordDomain, C> | NonEnumerableRecordCodec<D, C> {
   if ("keys" in domain) {
     return new EnumerableRecordCodec(domain, codomain, name);
@@ -961,7 +999,7 @@ export class Type<A, O = A, I = unknown> extends Codec<A, O, I> {
     /** succeeds if a value of type I can be decoded to a value of type A */
     readonly decode: Decode<I, A>,
     /** converts a value of type A to a value of type O */
-    readonly encode: Encode<A, O>
+    readonly encode: Encode<A, O>,
   ) {
     super(name);
   }
@@ -977,7 +1015,7 @@ export class RecursiveCodec<C extends ANY, A, O = A, I = unknown> extends Codec<
     readonly decode: Decode<I, A>,
     /** converts a value of type A to a value of type O */
     readonly encode: Encode<A, O>,
-    private readonly runDefinition: () => C
+    private readonly runDefinition: () => C,
   ) {
     super(name);
   }
@@ -989,7 +1027,7 @@ export class RecursiveCodec<C extends ANY, A, O = A, I = unknown> extends Codec<
 
 export function recursive<A, O = A, I = unknown, C extends Codec<A, O, I> = Codec<A, O, I>>(
   name: string,
-  definition: (self: C) => C
+  definition: (self: C) => C,
 ): RecursiveCodec<C, A, O, I> {
   let cache: C;
   let Self: any;
@@ -1005,7 +1043,7 @@ export function recursive<A, O = A, I = unknown, C extends Codec<A, O, I> = Code
     (input): input is A => runDefinition().is(input),
     (input, context) => runDefinition().decode(input, context),
     (value) => runDefinition().encode(value),
-    runDefinition
+    runDefinition,
   );
   return Self;
 }
@@ -1023,7 +1061,10 @@ export class OptionalCodec<C extends ANY> extends Codec<
   readonly optional: true = true;
   readonly #codec: UnionCodec<[C, typeof undefinedCodec]>;
 
-  constructor(codec: C, readonly name: string = `${codec.name}?`) {
+  constructor(
+    codec: C,
+    readonly name: string = `${codec.name}?`,
+  ) {
     super(name);
     this.#codec = union([codec, undefinedCodec]);
   }
@@ -1055,7 +1096,10 @@ export class SparseCodec<P extends Props> extends Codec<
 > {
   readonly #codec: TypeCodec<P>;
 
-  constructor(readonly props: P, name: string = getInterfaceTypeName(props)) {
+  constructor(
+    readonly props: P,
+    name: string = getInterfaceTypeName(props),
+  ) {
     super(name);
     this.#codec = new TypeCodec(props);
   }

@@ -62,10 +62,7 @@ test("decode", () => {
 
   const T7 = t.exact(t.refinement(t.type({ foo: t.string }), (p) => p.foo.length > 2));
   assertFailure(validate(T7, null), "Invalid value null supplied to /(Exact<{foo:string}≍<function1>>)");
-  assertFailure(
-    validate(T7, { foo: "a" }),
-    'Invalid value {"foo":"a"} supplied to /(Exact<{foo:string}≍<function1>>)'
-  );
+  assertFailure(validate(T7, { foo: "a" }), 'Invalid value {"foo":"a"} supplied to /(Exact<{foo:string}≍<function1>>)');
 });
 
 test("play nice with intersection", () => {
@@ -76,7 +73,7 @@ test("play nice with intersection", () => {
   assertDecode(T, { foo: "foo", baz: true }, { foo: "foo" });
   assertFailure(
     validate(T, null as any),
-    "Invalid value null supplied to /(Exact<{foo:string}&Partial<{bar:number}>>)"
+    "Invalid value null supplied to /(Exact<{foo:string}&Partial<{bar:number}>>)",
   );
 });
 

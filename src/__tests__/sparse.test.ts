@@ -27,7 +27,7 @@ test("handle mixed mixed props", () => {
   assertFailure(
     validate(Person, { name: "Alice", age: "twenty" }),
     'Invalid value "twenty" supplied to /({name:string,age:number?})/age(number?)/0(number)',
-    'Invalid value "twenty" supplied to /({name:string,age:number?})/age(number?)/1(undefined)'
+    'Invalid value "twenty" supplied to /({name:string,age:number?})/age(number?)/1(undefined)',
   );
 
   assert.equal(Person.encode({ name: "Alice" }), { name: "Alice" });

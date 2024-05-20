@@ -32,7 +32,7 @@ test("decode", () => {
   assertFailure(
     validate(T, true),
     "Invalid value true supplied to /(string|number)/0(string)",
-    "Invalid value true supplied to /(string|number)/1(number)"
+    "Invalid value true supplied to /(string|number)/1(number)",
   );
   const A = t.type({ type: t.literal("A"), a: t.number });
   const B = t.refinement(A, (x) => x.a > 0);
