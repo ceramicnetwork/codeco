@@ -684,15 +684,20 @@ export class ReadonlyCodec<TCodec extends ANY> extends Codec<
   OutputOf<TCodec>,
   InputOf<TCodec>
 > {
-  constructor(
-    readonly codec: TCodec,
-    readonly name = `Readonly<${codec.name}>`,
-  ) {
+  readonly codec: TCodec;
+  readonly name: string;
+  readonly is: TCodec["is"];
+  readonly encode: TCodec["encode"];
+  readonly decode: TCodec["decode"];
+
+  constructor(codec: TCodec, name = `Readonly<${codec.name}>`) {
     super(name);
+    this.codec = codec;
+    this.name = name;
+    this.is = this.codec.is.bind(this.codec);
+    this.encode = this.codec.encode.bind(this.codec);
+    this.decode = this.codec.decode.bind(this.codec);
   }
-  is = this.codec.is.bind(this.codec);
-  encode = this.codec.encode.bind(this.codec);
-  decode = this.codec.decode.bind(this.codec);
 }
 
 export function readonly<TCodec extends ANY>(codec: TCodec, name?: string) {
