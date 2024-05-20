@@ -21,8 +21,8 @@ devDependencies:
     specifier: ^18.0.0
     version: 18.0.0
   ts-essentials:
-    specifier: ^9.3.2
-    version: 9.3.2(typescript@5.0.4)
+    specifier: ^10.0.0
+    version: 10.0.0(typescript@5.0.4)
   tsm:
     specifier: ^2.3.0
     version: 2.3.0
@@ -393,10 +393,13 @@ packages:
       has-flag: 4.0.0
     dev: true
 
-  /ts-essentials@9.3.2(typescript@5.0.4):
-    resolution: {integrity: sha512-JxKJzuWqH1MmH4ZFHtJzGEhkfN3QvVR3C3w+4BIoWeoY68UVVoA2Np/Bca9z0IPSErVCWhv439aT0We4Dks8kQ==}
+  /ts-essentials@10.0.0(typescript@5.0.4):
+    resolution: {integrity: sha512-77FHNJEyysF9+1s4G6eejuA1lxw7uMchT3ZPy3CIbh7GIunffpshtM8pTe5G6N5dpOzNevqRHew859ceLWVBfw==}
     peerDependencies:
-      typescript: '>=4.1.0'
+      typescript: '>=4.5.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
     dependencies:
       typescript: 5.0.4
     dev: true

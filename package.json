@@ -62,7 +62,7 @@
     "conditional-type-checks": "^1.0.6",
     "prettier": "^2.8.8",
     "sinon": "^18.0.0",
-    "ts-essentials": "^9.3.2",
+    "ts-essentials": "^10.0.0",
     "tsm": "^2.3.0",
     "typescript": "^5.0.4",
     "uvu": "^0.5.6",
