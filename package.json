@@ -58,10 +58,10 @@
     }
   },
   "devDependencies": {
-    "@types/sinon": "^10.0.15",
+    "@types/sinon": "^17.0.3",
     "conditional-type-checks": "^1.0.6",
     "prettier": "^2.8.8",
-    "sinon": "^15.1.0",
+    "sinon": "^18.0.0",
     "ts-essentials": "^9.3.2",
     "tsm": "^2.3.0",
     "typescript": "^5.0.4",
