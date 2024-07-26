@@ -1,5 +1,4 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from "vitest";
 import * as t from "../struct.js";
 import { numberAsString } from "./number-as-string.js";
 import { validate, decode } from "../decoder.js";
@@ -9,8 +8,8 @@ test("replacement", () => {
   const T = t.replacement(numberAsString, "10");
   assertRight(validate(T, ""), 10);
   assertRight(validate(T, "3"), 3);
-  assert.equal(decode(T, ""), 10);
-  assert.equal(decode(T, "3"), 3);
+  expect(decode(T, "")).toBe(10);
+  expect(decode(T, "3")).toBe(3);
 });
 
 test("defaults", () => {
@@ -19,9 +18,9 @@ test("defaults", () => {
   assertRight(validate(T, undefined), 10);
   assertRight(validate(T, "3"), 3);
 
-  assert.equal(decode(T, ""), 10);
-  assert.equal(decode(T, undefined), 10);
-  assert.equal(decode(T, "3"), 3);
+  expect(decode(T, "")).toBe(10);
+  expect(decode(T, undefined)).toBe(10);
+  expect(decode(T, "3")).toBe(3);
 });
 
 test("postprocessDecode", () => {
@@ -30,16 +29,14 @@ test("postprocessDecode", () => {
   assertRight(validate(T, "3"), "3");
   assertRight(validate(T, "42 behemoths"), "10 behemoths");
 
-  assert.equal(decode(T, ""), "");
-  assert.equal(decode(T, "3"), "3");
-  assert.equal(decode(T, "42 behemoths"), "10 behemoths");
+  expect(decode(T, "")).toBe("");
+  expect(decode(T, "3")).toBe("3");
+  expect(decode(T, "42 behemoths")).toBe("10 behemoths");
 
-  assert.ok(T.is("42"));
-  assert.not.ok(T.is(42));
+  expect(T.is("42")).toBeTruthy();
+  expect(T.is(42)).toBeFalsy();
 
-  assert.equal(T.encode(""), "");
-  assert.equal(T.encode("10"), "10");
-  assert.equal(T.encode("42"), "42");
+  expect(T.encode("")).toBe("");
+  expect(T.encode("10")).toBe("10");
+  expect(T.encode("42")).toBe("42");
 });
-
-test.run();

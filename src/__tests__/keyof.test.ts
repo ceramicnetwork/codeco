@@ -1,5 +1,4 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { expect, test } from "vitest";
 import * as t from "../struct.js";
 import { assertDecode, assertFailure } from "./assertions.util.js";
 import { validate } from "../decoder.js";
@@ -7,16 +6,16 @@ import { validate } from "../decoder.js";
 const T = t.keyof({ a: 1, b: 2 });
 
 test("name", () => {
-  assert.equal(T.name, '"a"|"b"');
+  expect(T.name).toEqual('"a"|"b"');
   const T2 = t.keyof({ a: 1, b: 2 }, "T");
-  assert.equal(T2.name, "T");
+  expect(T2.name).toEqual("T");
 });
 
 test("is", () => {
-  assert.ok(T.is("a"));
-  assert.ok(T.is("b"));
-  assert.not.ok(T.is("c"));
-  assert.not.ok(T.is(null));
+  expect(T.is("a")).toBeTruthy();
+  expect(T.is("b")).toBeTruthy();
+  expect(T.is("c")).toBeFalsy();
+  expect(T.is(null)).toBeFalsy();
 });
 
 test("decode", () => {
@@ -26,5 +25,3 @@ test("decode", () => {
   // check for hasOwnProperty oddity: { a: 1 }.hasOwnProperty(['a'] as any) === true
   assertFailure(validate(T, ["a"]), 'Invalid value ["a"] supplied to /("a"|"b")');
 });
-
-test.run();

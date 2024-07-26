@@ -1,5 +1,4 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from "vitest";
 import * as t from "../struct.js";
 import { numberAsString } from "./number-as-string.js";
 import { assertFailure, assertLeft, assertRight } from "./assertions.util.js";
@@ -8,21 +7,21 @@ import { validate } from "../decoder.js";
 const T = t.union([t.string, t.number]);
 
 test("name", () => {
-  assert.equal(T.name, "string|number");
+  expect(T.name).toBe("string|number");
   const T2 = t.union([t.string, t.number], "T");
-  assert.equal(T2.name, "T");
+  expect(T2.name).toBe("T");
 });
 
 test("is", () => {
   // Isomorphic value
-  assert.ok(T.is(0));
-  assert.ok(T.is("foo"));
-  assert.not.ok(T.is(false));
+  expect(T.is(0)).toBeTruthy();
+  expect(T.is("foo")).toBeTruthy();
+  expect(T.is(false)).toBeFalsy();
   // Prismatic value
   const T2 = t.union([t.string, numberAsString]);
-  assert.ok(T2.is(0));
-  assert.ok(T2.is("foo"));
-  assert.not.ok(T2.is(false));
+  expect(T2.is(0)).toBeTruthy();
+  expect(T2.is("foo")).toBeTruthy();
+  expect(T2.is(false)).toBeFalsy();
 });
 
 test("decode", () => {
@@ -42,32 +41,31 @@ test("decode", () => {
 
 test("encode", () => {
   const T1 = t.union([t.type({ a: numberAsString }), t.number]);
-  assert.equal(T1.encode({ a: 1 }), { a: "1" });
-  assert.equal(T1.encode(1), 1);
+  expect(T1.encode({ a: 1 })).toEqual({ a: "1" });
+  expect(T1.encode(1)).toEqual(1);
 
   // Throw if none of the codecs are applicable
   const T2 = t.union([t.string, t.boolean]);
-  assert.throws(() => T2.encode(3 as any));
+  // @ts-expect-error Invalid type
+  expect(() => T2.encode(3)).toThrow();
 
   const x1 = { a: 1, c: true };
   const x2 = { b: 2, c: true };
   const T3 = t.union([t.strict({ a: t.number }), t.strict({ b: t.number })]);
-  assert.equal(T3.encode({ a: 1 }), { a: 1 });
-  assert.equal(T3.encode({ b: 2 }), { b: 2 });
-  assert.equal(T3.encode(x1), { a: 1 });
-  assert.equal(T3.encode(x2), { b: 2 });
+  expect(T3.encode({ a: 1 })).toEqual({ a: 1 });
+  expect(T3.encode({ b: 2 })).toEqual({ b: 2 });
+  expect(T3.encode(x1)).toEqual({ a: 1 });
+  expect(T3.encode(x2)).toEqual({ b: 2 });
 
   const T4 = t.union([t.strict({ a: t.number }), t.type({ b: numberAsString })]);
-  assert.equal(T4.encode({ a: 1 }), { a: 1 });
-  assert.equal(T4.encode({ b: 2 }), { b: "2" });
-  assert.equal(T4.encode(x1), { a: 1 });
-  assert.equal(T4.encode(x2), { b: "2", c: true });
+  expect(T4.encode({ a: 1 })).toEqual({ a: 1 });
+  expect(T4.encode({ b: 2 })).toEqual({ b: "2" });
+  expect(T4.encode(x1)).toEqual({ a: 1 });
+  expect(T4.encode(x2)).toEqual({ b: "2", c: true });
 
   const T5 = t.union([t.strict({ a: t.number }), t.strict({ b: numberAsString })]);
-  assert.equal(T5.encode({ a: 1 }), { a: 1 });
-  assert.equal(T5.encode({ b: 2 }), { b: "2" });
-  assert.equal(T5.encode(x1), { a: 1 });
-  assert.equal(T5.encode(x2), { b: "2" });
+  expect(T5.encode({ a: 1 })).toEqual({ a: 1 });
+  expect(T5.encode({ b: 2 })).toEqual({ b: "2" });
+  expect(T5.encode(x1)).toEqual({ a: 1 });
+  expect(T5.encode(x2)).toEqual({ b: "2" });
 });
-
-test.run();

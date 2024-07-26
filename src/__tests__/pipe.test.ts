@@ -1,6 +1,5 @@
+import { test, expect } from "vitest";
 import * as t from "../struct.js";
-import { test } from "uvu";
-import * as assert from "uvu/assert";
 import { assertDecode, assertFailure } from "./assertions.util.js";
 import { validate } from "../decoder.js";
 import { Type, type Context } from "../context.js";
@@ -18,13 +17,13 @@ const floatAsString = new Type<number, string, string>(
 const T = t.string.pipe(floatAsString);
 
 test("name", () => {
-  assert.equal(T.name, "string→float");
+  expect(T.name).toEqual("string→float");
   const T2 = t.string.pipe(floatAsString, "T");
-  assert.equal(T2.name, "T");
+  expect(T2.name).toEqual("T");
 });
 
 test("encode", () => {
-  assert.equal(T.encode(3.3), "3.3");
+  expect(T.encode(3.3)).toEqual("3.3");
 });
 
 test("decode", () => {
@@ -33,5 +32,3 @@ test("decode", () => {
   assertDecode(T2, "3.3", 3.3);
   assertFailure(validate(T2, "2.0"), 'Invalid value "2.0" supplied to /(string→float≍<function1>)');
 });
-
-test.run();

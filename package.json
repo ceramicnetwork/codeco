@@ -27,8 +27,8 @@
   ],
   "scripts": {
     "build": "./node_modules/.bin/tsc -p tsconfig.build.json",
-    "test": "./node_modules/.bin/tsm ./node_modules/uvu/bin.js . .+\\.test\\.ts",
-    "test:watch": "./node_modules/.bin/watchlist --eager src -- pnpm run test",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepublishOnly": "rm -rf dist/ && npm run build"
   },
   "type": "module",
@@ -58,15 +58,11 @@
     }
   },
   "devDependencies": {
-    "@types/sinon": "^17.0.3",
     "conditional-type-checks": "^1.0.6",
     "prettier": "^3.2.5",
-    "sinon": "^18.0.0",
     "ts-essentials": "^10.0.0",
-    "tsm": "^2.3.0",
     "typescript": "^5.4.5",
-    "uvu": "^0.5.6",
-    "watchlist": "^0.3.1"
+    "vitest": "^2.0.4"
   },
   "pnpm": {
     "overrides": {

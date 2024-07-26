@@ -1,4 +1,4 @@
-import { test } from "uvu";
+import { test } from "vitest";
 import { assertLeft, assertRight } from "./assertions.util.js";
 import * as t from "../struct.js";
 import { validate } from "../decoder.js";
@@ -12,5 +12,3 @@ test("unknownArray", () => {
   assertLeft(validate(t.unknownArray, null));
   assertLeft(validate(t.unknownArray, undefined));
 });
-
-test.run();

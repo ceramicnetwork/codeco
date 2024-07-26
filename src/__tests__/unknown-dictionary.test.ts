@@ -1,5 +1,4 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from "vitest";
 import { assertLeft, assertRight } from "./assertions.util.js";
 import * as t from "../struct.js";
 import { validate } from "../decoder.js";
@@ -7,11 +6,11 @@ import { validate } from "../decoder.js";
 const dictionary = t.unknownRecord;
 
 test("is", () => {
-  assert.ok(dictionary.is({}));
-  assert.ok(dictionary.is({ a: 1 }));
-  assert.not.ok(dictionary.is(new Number()));
-  assert.not.ok(dictionary.is([]));
-  assert.not.ok(dictionary.is(undefined));
+  expect(dictionary.is({})).toBeTruthy();
+  expect(dictionary.is({ a: 1 })).toBeTruthy();
+  expect(dictionary.is(new Number())).toBeFalsy();
+  expect(dictionary.is([])).toBeFalsy();
+  expect(dictionary.is(undefined)).toBeFalsy();
 });
 
 test("decode", () => {
@@ -25,5 +24,3 @@ test("decode", () => {
   assertLeft(validate(dictionary, undefined));
   assertLeft(validate(dictionary, []));
 });
-
-test.run();

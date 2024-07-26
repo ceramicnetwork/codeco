@@ -1,5 +1,4 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from "vitest";
 import * as t from "../struct.js";
 import { numberAsString } from "./number-as-string.js";
 import { assertFailure, assertRight } from "./assertions.util.js";
@@ -8,20 +7,20 @@ import { validate } from "../decoder.js";
 const T = t.readonly(t.type({ a: t.number }));
 
 test("name", () => {
-  assert.equal(T.name, `Readonly<{a:number}>`);
+  expect(T.name).toBe("Readonly<{a:number}>");
   const T2 = t.readonly(t.type({ a: t.number }), "T2");
-  assert.equal(T2.name, "T2");
+  expect(T2.name).toBe("T2");
 });
 
 test("is", () => {
-  assert.ok(T.is({ a: 1 }));
-  assert.not.ok(T.is({ a: "foo" }));
-  assert.not.ok(T.is(undefined));
+  expect(T.is({ a: 1 })).toBeTruthy();
+  expect(T.is({ a: "foo" })).toBeFalsy();
+  expect(T.is(undefined)).toBeFalsy();
 
   const T2 = t.readonly(t.type({ a: numberAsString }));
-  assert.ok(T2.is({ a: 1 }));
-  assert.not.ok(T2.is({ a: "1" }));
-  assert.not.ok(T2.is(undefined));
+  expect(T2.is({ a: 1 })).toBeTruthy();
+  expect(T2.is({ a: "1" })).toBeFalsy();
+  expect(T2.is(undefined)).toBeFalsy();
 });
 
 test("decode", () => {
@@ -30,9 +29,7 @@ test("decode", () => {
 });
 
 test("encode", () => {
-  assert.equal(T.encode({ a: 1 }), { a: 1 });
+  expect(T.encode({ a: 1 })).toEqual({ a: 1 });
   const T2 = t.readonly(t.type({ a: numberAsString }));
-  assert.equal(T2.encode({ a: 1 }), { a: "1" });
+  expect(T2.encode({ a: 1 })).toEqual({ a: "1" });
 });
-
-test.run();

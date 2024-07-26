@@ -1,5 +1,4 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from "vitest";
 import * as t from "../struct.js";
 import { assertFailure, assertRight } from "./assertions.util.js";
 import { numberAsString } from "./number-as-string.js";
@@ -9,14 +8,14 @@ const T = t.array(t.number);
 const T2 = t.array(numberAsString);
 
 test("name", () => {
-  assert.equal(T.name, "number[]");
-  assert.equal(t.array(t.number, "numbers").name, "numbers");
+  expect(T.name).toBe("number[]");
+  expect(t.array(t.number, "numbers").name).toBe("numbers");
 });
 
 test("is", () => {
-  assert.ok(T.is([]));
-  assert.ok(T.is([0]));
-  assert.not.ok(T.is([0, "foo"]));
+  expect(T.is([])).toBeTruthy();
+  expect(T.is([0])).toBeTruthy();
+  expect(T.is([0, "foo"])).toBeFalsy();
 });
 
 test("decode", () => {
@@ -28,8 +27,6 @@ test("decode", () => {
 });
 
 test("encode", () => {
-  assert.equal(T.encode([1, 2, 3]), [1, 2, 3]);
-  assert.equal(T2.encode([1, 2, 3]), ["1", "2", "3"]);
+  expect(T.encode([1, 2, 3])).toEqual([1, 2, 3]);
+  expect(T2.encode([1, 2, 3])).toEqual(["1", "2", "3"]);
 });
-
-test.run();

@@ -1,5 +1,4 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from "vitest";
 import * as t from "../struct.js";
 import type { IsExact } from "conditional-type-checks";
 import { assertDecode, assertFailure } from "./assertions.util.js";
@@ -11,15 +10,15 @@ function assertT<T extends true>() {
 
 test("name", () => {
   const T = t.sparse({ name: t.string, age: t.optional(t.number) });
-  assert.equal(T.name, "{name:string,age:number?}");
+  expect(T.name).toBe("{name:string,age:number?}");
   const T2 = t.sparse({ name: t.string, age: t.optional(t.number) }, "T");
-  assert.equal(T2.name, "T");
+  expect(T2.name).toBe("T");
 });
 
-test("handle mixed mixed props", () => {
+test("handle mixed props", () => {
   const Person = t.sparse({ name: t.string, age: t.optional(t.number) });
   assertT<IsExact<t.TypeOf<typeof Person>, { name: string; age?: number }>>();
-  assert.equal(Person.props, { name: t.string, age: t.optional(t.number) });
+  expect(Person.props).toEqual({ name: t.string, age: t.optional(t.number) });
   assertDecode(Person, { name: "Alice" });
   assertDecode(Person, { name: "Alice", age: 20 });
 
@@ -30,8 +29,6 @@ test("handle mixed mixed props", () => {
     'Invalid value "twenty" supplied to /({name:string,age:number?})/age(number?)/1(undefined)',
   );
 
-  assert.equal(Person.encode({ name: "Alice" }), { name: "Alice" });
-  assert.equal(Person.encode({ name: "Alice", age: 20 }), { name: "Alice", age: 20 });
+  expect(Person.encode({ name: "Alice" })).toEqual({ name: "Alice" });
+  expect(Person.encode({ name: "Alice", age: 20 })).toEqual({ name: "Alice", age: 20 });
 });
-
-test.run();

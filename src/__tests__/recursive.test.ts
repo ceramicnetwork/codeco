@@ -1,5 +1,4 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from "vitest";
 import * as t from "../struct.js";
 import { numberAsString } from "./number-as-string.js";
 import { assertDecode, assertFailure } from "./assertions.util.js";
@@ -29,8 +28,8 @@ test("is", () => {
       b: t.union([self, t.null]),
     }),
   );
-  assert.ok(T.is({ a: 0, b: null }));
-  assert.not.ok(T.is({ a: 0 }));
+  expect(T.is({ a: 0, b: null })).toBeTruthy();
+  expect(T.is({ a: 0 })).toBeFalsy();
 
   type O = {
     a: string;
@@ -42,8 +41,8 @@ test("is", () => {
       b: t.union([self, t.null]),
     }),
   );
-  assert.ok(T2.is({ a: 0, b: null }));
-  assert.not.ok(T2.is({ a: 0 }));
+  expect(T2.is({ a: 0, b: null })).toBeTruthy();
+  expect(T2.is({ a: 0 })).toBeFalsy();
 });
 
 test("decode", () => {
@@ -74,8 +73,8 @@ test("encode", () => {
       b: t.union([self, t.null]),
     }),
   );
-  assert.equal(T.encode({ a: 0, b: null }), { a: "0", b: null });
-  assert.equal(T.encode({ a: 0, b: { a: 1, b: null } }), { a: "0", b: { a: "1", b: null } });
+  expect(T.encode({ a: 0, b: null })).toEqual({ a: "0", b: null });
+  expect(T.encode({ a: 0, b: { a: 1, b: null } })).toEqual({ a: "0", b: { a: "1", b: null } });
 });
 
 test("codec field", () => {
@@ -89,11 +88,11 @@ test("codec field", () => {
       b: t.union([self, t.null]),
     }),
   );
-  assert.instance(T.codec, Codec);
-  assert.equal(T.codec.name, "T");
+  expect(T.codec).toBeInstanceOf(Codec);
+  expect(T.codec.name).toBe("T");
   const aCodec = (T.codec as any).props.a;
-  assert.instance(aCodec, t.TrivialCodec);
-  assert.equal(aCodec.name, "number");
+  expect(aCodec).toBeInstanceOf(t.TrivialCodec);
+  expect(aCodec.name).toBe("number");
 });
 
 test("mutually recursive types", () => {
@@ -113,8 +112,8 @@ test("mutually recursive types", () => {
       a: t.union([A, t.null]),
     }),
   );
-  assert.ok(A.is({ b: { b: null } }));
-  assert.ok(A.is({ b: { a: { b: { a: null } } } }));
+  expect(A.is({ b: { b: null } })).toBeTruthy();
+  expect(A.is({ b: { a: { b: { a: null } } } })).toBeTruthy();
 
   // #354
   interface C1A {
@@ -128,9 +127,7 @@ test("mutually recursive types", () => {
   const C2: Codec<C1A> = t.recursive("C2", () => C1);
   const C3 = t.union([C1, t.string]);
 
-  assert.ok(C3.is({ a: "a" }));
-  assert.ok(C3.is("a"));
-  assert.ok(C3.is({ a: { a: "a" } }));
+  expect(C3.is({ a: "a" })).toBeTruthy();
+  expect(C3.is("a")).toBeTruthy();
+  expect(C3.is({ a: { a: "a" } })).toBeTruthy();
 });
-
-test.run();

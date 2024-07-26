@@ -1,5 +1,4 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from "vitest";
 import * as t from "../struct.js";
 import { assertFailure, assertRight } from "./assertions.util.js";
 import { validate } from "../decoder.js";
@@ -8,14 +7,14 @@ import { identity } from "../context.js";
 const T = t.literal("a");
 
 test("name", () => {
-  assert.equal(T.name, '"a"');
+  expect(T.name).toEqual('"a"');
   const T1 = t.literal("a", "custom");
-  assert.equal(T1.name, "custom");
+  expect(T1.name).toEqual("custom");
 });
 
 test("is", () => {
-  assert.ok(T.is("a"));
-  assert.not.ok(T.is("b"));
+  expect(T.is("a")).toBeTruthy();
+  expect(T.is("b")).toBeFalsy();
 });
 
 test("decode", () => {
@@ -24,8 +23,6 @@ test("decode", () => {
 });
 
 test("encode", () => {
-  assert.equal(T.encode("a"), "a");
-  assert.equal(T.encode, identity);
+  expect(T.encode("a")).toEqual("a");
+  expect(T.encode).toEqual(identity);
 });
-
-test.run();

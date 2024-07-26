@@ -1,5 +1,4 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from "vitest";
 import * as t from "../struct.js";
 import { numberAsString } from "./number-as-string.js";
 import { assertFailure, assertRight } from "./assertions.util.js";
@@ -19,21 +18,21 @@ class A {
 const T3 = t.strict({ a: t.string, b: t.string });
 
 test("name", () => {
-  assert.equal(T.name, `Exact<{a:number}>`);
+  expect(T.name).toEqual(`Exact<{a:number}>`);
   const T2 = t.strict({ a: t.number }, "T");
-  assert.equal(T2.name, "T");
+  expect(T2.name).toEqual("T");
 });
 
 test("is", () => {
-  assert.ok(T.is({ a: 0 }));
-  assert.ok(T.is({ a: 0, b: 1 }));
-  assert.not.ok(T.is(undefined));
+  expect(T.is({ a: 0 })).toBeTruthy();
+  expect(T.is({ a: 0, b: 1 })).toBeTruthy();
+  expect(T.is(undefined)).toBeFalsy();
   const T2 = t.strict({ a: numberAsString });
-  assert.ok(T2.is({ a: 1 }));
-  assert.ok(T2.is({ a: 1, b: 1 }));
-  assert.not.ok(T2.is({ b: 1, c: 1 }));
-  assert.not.ok(T2.is(undefined));
-  assert.ok(T3.is(new A()));
+  expect(T2.is({ a: 1 })).toBeTruthy();
+  expect(T2.is({ a: 1, b: 1 })).toBeTruthy();
+  expect(T2.is({ b: 1, c: 1 })).toBeFalsy();
+  expect(T2.is(undefined)).toBeFalsy();
+  expect(T3.is(new A())).toBeTruthy();
 });
 
 test("decode", () => {
@@ -47,7 +46,5 @@ test("decode", () => {
 
 test("encode", () => {
   const T1 = t.strict({ a: numberAsString });
-  assert.equal(T1.encode({ a: 1 }), { a: "1" });
+  expect(T1.encode({ a: 1 })).toEqual({ a: "1" });
 });
-
-test.run();

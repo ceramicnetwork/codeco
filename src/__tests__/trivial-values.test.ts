@@ -1,9 +1,9 @@
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect, assert } from "vitest";
 import * as t from "../struct.js";
 import { assertRight, assertFailure } from "./assertions.util.js";
 import { isRight } from "../either.js";
 import { validate } from "../decoder.js";
+import type { ANY } from "../context.js";
 
 test("null", () => {
   assertRight(validate(t.null, null), null);
@@ -31,9 +31,9 @@ test("bigint", () => {
   assertRight(validate(t.bigint, 15n), 15n);
   const bigNumber = BigInt(Number.MAX_SAFE_INTEGER) + 4n;
   const decodedBigNumber = validate(t.bigint, bigNumber);
-  assert.ok(isRight(decodedBigNumber));
-  assert.equal(decodedBigNumber.right, bigNumber);
-  assert.equal(decodedBigNumber.right.toString(), "9007199254740995");
+  assert(isRight(decodedBigNumber));
+  expect(decodedBigNumber.right).toBe(bigNumber);
+  expect(decodedBigNumber.right.toString()).toBe("9007199254740995");
 
   assertFailure(validate(t.bigint, true), "Invalid value true supplied to /(bigint)");
   assertFailure(validate(t.bigint, "string"), 'Invalid value "string" supplied to /(bigint)');
@@ -52,13 +52,13 @@ test("unknown", () => {
   assertRight(validate(t.unknown, true), true);
   assertRight(validate(t.unknown, {}), {});
   assertRight(validate(t.unknown, []), []);
-  assert.ok(t.unknown.is(null));
-  assert.ok(t.unknown.is(undefined));
-  assert.ok(t.unknown.is("foo"));
-  assert.ok(t.unknown.is(1));
-  assert.ok(t.unknown.is(true));
-  assert.ok(t.unknown.is({}));
-  assert.ok(t.unknown.is([]));
+  expect(t.unknown.is(null)).toBeTruthy();
+  expect(t.unknown.is(undefined)).toBeTruthy();
+  expect(t.unknown.is("foo")).toBeTruthy();
+  expect(t.unknown.is(1)).toBeTruthy();
+  expect(t.unknown.is(true)).toBeTruthy();
+  expect(t.unknown.is({})).toBeTruthy();
+  expect(t.unknown.is([])).toBeTruthy();
 });
 
 test("any", () => {
@@ -70,17 +70,17 @@ test("any", () => {
   assertRight(validate(t.any, 1), 1);
   assertRight(validate(t.any, {}), {});
   assertRight(validate(t.any, []), []);
-  assert.ok(t.any.is(null));
-  assert.ok(t.any.is(undefined));
-  assert.ok(t.any.is("foo"));
-  assert.ok(t.any.is(1));
-  assert.ok(t.any.is(true));
-  assert.ok(t.any.is({}));
-  assert.ok(t.any.is([]));
+  expect(t.any.is(null)).toBeTruthy();
+  expect(t.any.is(undefined)).toBeTruthy();
+  expect(t.any.is("foo")).toBeTruthy();
+  expect(t.any.is(1)).toBeTruthy();
+  expect(t.any.is(true)).toBeTruthy();
+  expect(t.any.is({})).toBeTruthy();
+  expect(t.any.is([])).toBeTruthy();
 });
 
 test("never", () => {
-  const T = t.never as t.ANY;
+  const T = t.never as ANY;
   assertFailure(validate(T, null), "Invalid value null supplied to /(never)");
   assertFailure(validate(T, undefined), "Invalid value undefined supplied to /(never)");
   assertFailure(validate(T, "foo"), 'Invalid value "foo" supplied to /(never)');
@@ -89,13 +89,11 @@ test("never", () => {
   assertFailure(validate(T, {}), "Invalid value {} supplied to /(never)");
   assertFailure(validate(T, []), "Invalid value [] supplied to /(never)");
 
-  assert.not.ok(T.is(null));
-  assert.not.ok(T.is(undefined));
-  assert.not.ok(T.is("foo"));
-  assert.not.ok(T.is(1));
-  assert.not.ok(T.is(true));
-  assert.not.ok(T.is({}));
-  assert.not.ok(T.is([]));
+  expect(T.is(null)).toBeFalsy();
+  expect(T.is(undefined)).toBeFalsy();
+  expect(T.is("foo")).toBeFalsy();
+  expect(T.is(1)).toBeFalsy();
+  expect(T.is(true)).toBeFalsy();
+  expect(T.is({})).toBeFalsy();
+  expect(T.is([])).toBeFalsy();
 });
-
-test.run();
