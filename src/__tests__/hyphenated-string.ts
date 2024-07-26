@@ -1,12 +1,13 @@
 import * as t from "../struct.js";
 import { isLeft } from "../either.js";
+import { Codec, type Context, type Validation } from "../context.js";
 
-export class HyphenatedStringCodec extends t.Codec<string> {
+export class HyphenatedStringCodec extends Codec<string> {
   constructor() {
     super("HyphenatedString");
   }
 
-  decode(input: unknown, context: t.Context): t.Validation<string> {
+  decode(input: unknown, context: Context): Validation<string> {
     const decodedE = t.string.decode(input, context);
     if (isLeft(decodedE)) return decodedE;
     const decoded = decodedE.right;

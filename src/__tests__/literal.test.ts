@@ -3,6 +3,7 @@ import * as assert from "uvu/assert";
 import * as t from "../struct.js";
 import { assertFailure, assertRight } from "./assertions.util.js";
 import { validate } from "../decoder.js";
+import { identity } from "../context.js";
 
 const T = t.literal("a");
 
@@ -24,7 +25,7 @@ test("decode", () => {
 
 test("encode", () => {
   assert.equal(T.encode("a"), "a");
-  assert.equal(T.encode, t.identity);
+  assert.equal(T.encode, identity);
 });
 
 test.run();

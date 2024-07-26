@@ -1,8 +1,8 @@
 import * as t from "../struct.js";
 import { isLeft, type Either } from "../either.js";
-import { Codec, type Errors } from "../struct.js";
+import { Codec, type Context, type Errors } from "../context.js";
 
-class NumberAsString extends t.Codec<number, string> {
+class NumberAsString extends Codec<number, string> {
   constructor() {
     super("NumberFromString");
   }
@@ -10,7 +10,7 @@ class NumberAsString extends t.Codec<number, string> {
   is = t.number.is.bind(t.number);
   encode = String;
 
-  decode(input: unknown, context: t.Context): Either<Errors, number> {
+  decode(input: unknown, context: Context): Either<Errors, number> {
     const stringE = t.string.decode(input, context);
     if (isLeft(stringE)) return stringE;
     const result = +stringE.right;

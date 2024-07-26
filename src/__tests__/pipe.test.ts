@@ -2,12 +2,13 @@ import * as t from "../struct.js";
 import { test } from "uvu";
 import * as assert from "uvu/assert";
 import { assertDecode, assertFailure } from "./assertions.util.js";
-import { validate } from "../decoder";
+import { validate } from "../decoder.js";
+import { Type, type Context } from "../context.js";
 
-const floatAsString = new t.Type<number, string, string>(
+const floatAsString = new Type<number, string, string>(
   `float`,
   t.number.is,
-  (input: string, context: t.Context) => {
+  (input: string, context: Context) => {
     const n = parseFloat(input);
     return isNaN(n) ? context.failure() : context.success(n);
   },

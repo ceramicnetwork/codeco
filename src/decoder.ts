@@ -1,57 +1,6 @@
-import type { NonEmptyArray } from "ts-essentials";
-import { isLeft, left, right } from "./either.js";
-import type { Trail, Validation, Errors, Context, Decoder } from "./struct.js";
-import { ValidationError } from "./struct.js";
-
-export class LazyContext implements Context {
-  constructor(readonly trail: Trail) {}
-
-  static root<TInput, TValue>(codec: Decoder<TInput, TValue>, input: TInput) {
-    return new LazyContext([{ key: "", type: codec, actual: input }]);
-  }
-
-  failures<TValue>(errors: Errors): Validation<TValue> {
-    return left(errors);
-  }
-
-  success<TValue>(value: TValue): Validation<TValue> {
-    return right(value);
-  }
-
-  failure<TValue>(message?: string): Validation<TValue> {
-    return left([new ValidationError(this.trail, message)]);
-  }
-
-  child<TCodec extends Decoder<any, any>>(key: string, codec: TCodec, input: unknown): Context {
-    const nextTrail = this.trail.concat([{ key: key, type: codec, actual: input }]);
-    return new LazyContext(nextTrail);
-  }
-}
-
-export class ThrowContext implements Context {
-  constructor(readonly trail: Trail) {}
-
-  static root<TInput, TValue>(codec: Decoder<TInput, TValue>, input: TInput) {
-    return new ThrowContext([{ key: "", type: codec, actual: input }]);
-  }
-
-  failures<TValue>(errors: NonEmptyArray<ValidationError>): never {
-    throw errors[0];
-  }
-
-  success<TValue>(value: TValue): Validation<TValue> {
-    return right(value);
-  }
-
-  failure<TValue>(message?: string): never {
-    throw new ValidationError(this.trail, message);
-  }
-
-  child<TCodec extends Decoder<any, any>>(key: string, codec: TCodec, input: unknown): Context {
-    const nextTrail = this.trail.concat([{ key: key, type: codec, actual: input }]);
-    return new ThrowContext(nextTrail);
-  }
-}
+import { isLeft } from "./either.js";
+import type { Validation, Decoder } from "./context.js";
+import { LazyContext, ThrowContext } from "./context.js";
 
 export function validate<TInput, TValue>(codec: Decoder<TInput, TValue>, input: TInput): Validation<TValue> {
   const context = LazyContext.root(codec, input);

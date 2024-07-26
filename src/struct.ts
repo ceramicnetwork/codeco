@@ -1,77 +1,12 @@
 import { type Either, isLeft, right } from "./either.js";
 import type { NonEmptyArray } from "ts-essentials";
 import type { HKT, Intersection, MapOver } from "./hkt.js";
-import { LazyContext } from "./decoder.js";
+import type { Refinement, ANY, MIXED, Validation, Context, Encode, Decode, Is, Predicate, Errors } from "./context.js";
+import { Codec, ValidationError, LazyContext, getFunctionName, identity } from "./context.js";
 
 export function isNonEmpty<T>(array: Array<T>): array is NonEmptyArray<T> {
   return array.length > 0;
 }
-
-export type Refinement<A, B extends A> = (a: A) => a is B;
-export type Predicate<A> = (a: A) => boolean;
-
-export type Errors = Array<ValidationError>;
-
-export interface TrailEntry {
-  readonly key: string;
-  readonly type: Decoder<any, any>;
-  readonly actual: unknown;
-}
-
-export type Validation<A> = Either<Errors, A>;
-export type Is<A> = Refinement<unknown, A>;
-
-export type Encode<A, O> = (a: A) => O;
-export type Decode<I, A> = (input: I, context: Context) => Validation<A>;
-
-export interface Decoder<I, A> {
-  readonly name: string;
-  decode: Decode<I, A>;
-}
-
-export type Trail = ReadonlyArray<TrailEntry>;
-
-export interface Context {
-  trail: Trail;
-  success<TValue>(value: TValue): Validation<TValue>;
-  failures<TValue>(errors: Errors): Validation<TValue>;
-  failure<TValue>(message?: string): Validation<TValue>;
-  child<TCodec extends ANY>(key: string, codec: TCodec, input: unknown): Context;
-}
-export type IContext = Context;
-
-function getContextPath(trail: Trail): string {
-  return `/` + trail.map(({ key, type }) => `${key}(${type.name})`).join("/");
-}
-
-function stringify(v: any): string {
-  if (typeof v === "function") {
-    return getFunctionName(v);
-  }
-  if (typeof v === "number" && !isFinite(v)) {
-    if (isNaN(v)) {
-      return "NaN";
-    }
-    return v > 0 ? "Infinity" : "-Infinity";
-  }
-  return JSON.stringify(v);
-}
-
-export class ValidationError extends Error {
-  constructor(
-    readonly trail: Trail,
-    message: string = `Invalid value ${stringify(trail[trail.length - 1].actual)} supplied to ${getContextPath(trail)}`,
-  ) {
-    super(message);
-  }
-
-  get value() {
-    return this.trail[this.trail.length - 1].actual;
-  }
-}
-
-export type ANY = Codec<any, any, any>;
-export type MIXED<T = any> = Codec<T, any, unknown>;
 
 export type TypeOf<T extends ANY> = T["_A"];
 export type InputOf<T extends ANY> = T["_I"];
@@ -104,70 +39,6 @@ type PropsOf<TCodec> = TCodec extends { props: infer P extends Props }
   : TCodec extends { codec: infer P }
     ? PropsOf<P>
     : {};
-
-export abstract class Codec<A, O = A, I = unknown> implements Decoder<I, A> {
-  readonly _A!: A;
-  readonly _I!: I;
-  readonly _O!: O;
-  readonly name: string;
-
-  protected constructor(name: string) {
-    this.name = name;
-  }
-
-  abstract is(input: unknown): input is A;
-  abstract encode(value: A): O;
-  abstract decode(input: I, context: Context): Validation<A>;
-
-  pipe<B, IB, A extends IB, OB extends A>(
-    this: Type<A, O, I>,
-    ab: Type<B, OB, IB>,
-    name = `${this.name}→${ab.name}`,
-  ): Type<B, O, I> {
-    return new Type<B, O, I>(
-      name,
-      ab.is,
-      (i, c) => {
-        const e = this.decode(i, c);
-        if (isLeft(e)) {
-          return e;
-        }
-        return ab.decode(e.right, c);
-      },
-      this.encode === identity && ab.encode === identity ? (identity as any) : (b) => this.encode(ab.encode(b)),
-    );
-  }
-}
-
-export class PipeCodec<O, I, B, IB, A extends IB, OB extends A> extends Codec<B, O, I> {
-  #a: Codec<A, O, I>;
-  #b: Codec<B, OB, IB>;
-
-  constructor(a: Codec<A, O, I>, b: Codec<B, OB, IB>, name: string = `${a.name}→${b.name}`) {
-    super(name);
-    this.#a = a;
-    this.#b = b;
-  }
-
-  decode(input: A extends ANY ? A["_I"] : never, context: Context): Validation<B> {
-    const aE = this.#a.decode(input, context);
-    if (isLeft(aE)) return aE;
-    const a = aE.right;
-    return this.#b.decode(a, context);
-  }
-
-  encode(value: B): O {
-    return this.#a.encode(this.#b.encode(value));
-  }
-
-  is(input: unknown): input is B {
-    return this.#b.is(input);
-  }
-}
-
-export function identity<T>(value: T) {
-  return value;
-}
 
 export class TrivialCodec<T> extends Codec<T> {
   constructor(
@@ -419,10 +290,6 @@ export class UnionCodec<TCodecs extends [MIXED, MIXED, ...Array<MIXED>]> extends
 
 export function union<TCodecs extends [MIXED, MIXED, ...Array<MIXED>]>(codecs: TCodecs, name?: string) {
   return new UnionCodec(codecs, name);
-}
-
-export function getFunctionName(f: Function): string {
-  return (f as any).displayName || (f as any).name || `<function${f.length}>`;
 }
 
 export class RefinementCodec<TCodec extends ANY, B extends TypeOf<TCodec> = TypeOf<TCodec>> extends Codec<
@@ -989,24 +856,6 @@ export function record<D extends MIXED<string>, C extends MIXED>(
     return new EnumerableRecordCodec(domain, codomain, name);
   } else {
     return new NonEnumerableRecordCodec(domain, codomain, name);
-  }
-}
-
-/**
- * Slight compatibility layer with io-ts codecs
- */
-export class Type<A, O = A, I = unknown> extends Codec<A, O, I> {
-  constructor(
-    /** a unique name for this codec */
-    readonly name: string,
-    /** a custom type guard */
-    readonly is: Is<A>,
-    /** succeeds if a value of type I can be decoded to a value of type A */
-    readonly decode: Decode<I, A>,
-    /** converts a value of type A to a value of type O */
-    readonly encode: Encode<A, O>,
-  ) {
-    super(name);
   }
 }
 
