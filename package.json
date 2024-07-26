@@ -27,6 +27,7 @@
   ],
   "scripts": {
     "build": "./node_modules/.bin/tsc -p tsconfig.build.json",
+    "compile": "./node_modules/.bin/tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "prepublishOnly": "rm -rf dist/ && npm run build"
@@ -63,10 +64,5 @@
     "ts-essentials": "^10.0.0",
     "typescript": "^5.4.5",
     "vitest": "^2.0.4"
-  },
-  "pnpm": {
-    "overrides": {
-      "esbuild": "^0.17.15"
-    }
   }
 }
