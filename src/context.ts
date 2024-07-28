@@ -107,8 +107,7 @@ export abstract class Codec<A, O = A, I = unknown> implements Decoder<I, A> {
     );
   }
 
-  parse(input: I): A {
-    const context = ThrowContext.root(this, input);
+  parse(input: I, context: Context = ThrowContext.root(this, input)): A {
     const decodeResult = this.decode(input, context);
     if (isLeft(decodeResult)) throw new Error(`Something is wrong: ${decodeResult} should be Right`);
     return decodeResult.right;

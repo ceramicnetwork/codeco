@@ -286,6 +286,10 @@ export class UnionCodec<TCodecs extends [MIXED, MIXED, ...Array<MIXED>]> extends
   is(input: unknown): input is TypeOf<TCodecs[number]> {
     return this.codecs.some((c) => c.is(input));
   }
+
+  parse(input: unknown, context: Context = LazyContext.root(this, input)) {
+    return super.parse(input, context);
+  }
 }
 
 export function union<TCodecs extends [MIXED, MIXED, ...Array<MIXED>]>(codecs: TCodecs, name?: string) {
