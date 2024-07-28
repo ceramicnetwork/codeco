@@ -16,25 +16,25 @@ export type TypeOf$<T> = T extends ANY ? T["_A"] : never;
 export type InputOf$<T> = T extends ANY ? T["_I"] : never;
 export type OutputOf$<T> = T extends ANY ? T["_O"] : never;
 
-interface $TypeOf extends HKT {
+export interface $TypeOf extends HKT {
   readonly type: TypeOf$<this["_A"]>;
 }
 
-interface $OutputOf extends HKT {
+export interface $OutputOf extends HKT {
   readonly type: OutputOf$<this["_A"]>;
 }
 
-interface $InputOf extends HKT {
+export interface $InputOf extends HKT {
   readonly type: InputOf$<this["_A"]>;
 }
 
-interface $PropsOf extends HKT {
+export interface $PropsOf extends HKT {
   readonly type: PropsOf<this["_A"]>;
 }
 
 export type Props = { [K in string]: ANY };
 type WithProps = { props: Props } | { codec: WithProps };
-type PropsOf<TCodec> = TCodec extends { props: infer P extends Props }
+export type PropsOf<TCodec> = TCodec extends { props: infer P extends Props }
   ? P
   : TCodec extends { codec: infer P }
     ? PropsOf<P>
