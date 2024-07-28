@@ -190,7 +190,11 @@ export function getNameFromProps(props: Props): string {
     .join(",");
 }
 
-export class TypeCodec<P extends Props> extends Codec<MapOver<P, $TypeOf>, MapOver<P, $OutputOf>> {
+export class TypeCodec<P extends Props> extends Codec<
+  MapOver<P, $TypeOf>,
+  MapOver<P, $OutputOf>,
+  MapOver<P, $InputOf>
+> {
   constructor(
     readonly props: P,
     name: string = getInterfaceTypeName(props),
