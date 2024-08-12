@@ -1,8 +1,8 @@
 import { isLeft, left, right, type Left, type Maybe } from "./either.js";
 
-export type Combinator<T, P extends string | Uint8Array> = { (t: Tape<P>): Maybe<T>; name?: string };
+type TapeSubstrate = string | Uint8Array | DataView;
 
-type TapeSubstrate = string | Uint8Array;
+export type Combinator<T, P extends TapeSubstrate> = { (t: Tape<P>): Maybe<T>; name?: string };
 
 export interface Tape<P extends TapeSubstrate> {
   readonly input: P;
@@ -11,12 +11,49 @@ export interface Tape<P extends TapeSubstrate> {
 }
 
 export class StringTape implements Tape<string> {
-  position: number = 0;
+  position: number;
+  readonly input: string;
 
-  constructor(readonly input: string) {}
+  constructor(input: string) {
+    this.input = input;
+    this.position = 0;
+  }
 
   get isEOF() {
     return this.position >= this.input.length;
+  }
+}
+
+export class BytesTape implements Tape<Uint8Array> {
+  position: number;
+  readonly input: Uint8Array;
+
+  constructor(input: Uint8Array) {
+    this.input = input;
+    this.position = 0;
+  }
+
+  get isEOF() {
+    return this.position >= this.input.byteLength;
+  }
+}
+
+export class DataViewTape implements Tape<DataView> {
+  position: number;
+  readonly input: DataView;
+
+  static fromBytes(bytes: Uint8Array): DataViewTape {
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.length);
+    return new DataViewTape(view);
+  }
+
+  constructor(input: DataView) {
+    this.input = input;
+    this.position = 0;
+  }
+
+  get isEOF() {
+    return this.position >= this.input.byteLength;
   }
 }
 
@@ -322,7 +359,7 @@ export function parseAll<T, P extends TapeSubstrate>(combinator: Combinator<T, P
     if (isLeft(result)) return result;
     // Check if input is consumed
     if (!tape.isEOF) {
-      return failure(new Error(`Consumed only ${tape.position} of ${tape.input.length} input length`), prev, tape);
+      return failure(new Error(`Consumed only ${tape.position} of input`), prev, tape);
     }
     return result;
   };
