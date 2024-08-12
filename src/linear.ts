@@ -1,6 +1,6 @@
 import { isLeft, left, right, type Left, type Maybe } from "./either.js";
 
-type TapeSubstrate = string | Uint8Array | DataView;
+export type TapeSubstrate = string | Uint8Array;
 
 export type Combinator<T, P extends TapeSubstrate> = { (t: Tape<P>): Maybe<T>; name?: string };
 
@@ -29,25 +29,6 @@ export class BytesTape implements Tape<Uint8Array> {
   readonly input: Uint8Array;
 
   constructor(input: Uint8Array) {
-    this.input = input;
-    this.position = 0;
-  }
-
-  get isEOF() {
-    return this.position >= this.input.byteLength;
-  }
-}
-
-export class DataViewTape implements Tape<DataView> {
-  position: number;
-  readonly input: DataView;
-
-  static fromBytes(bytes: Uint8Array): DataViewTape {
-    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.length);
-    return new DataViewTape(view);
-  }
-
-  constructor(input: DataView) {
     this.input = input;
     this.position = 0;
   }
