@@ -964,7 +964,7 @@ export class SparseCodec<P extends Props> extends Codec<
 
   cleanup(output: any): any {
     Object.entries(this.props).forEach(([propName, propCodec]) => {
-      if (isOptionalCodec(propCodec) && !output[propName]) {
+      if (isOptionalCodec(propCodec) && typeof output[propName] === "undefined") {
         delete output[propName];
       }
     });
